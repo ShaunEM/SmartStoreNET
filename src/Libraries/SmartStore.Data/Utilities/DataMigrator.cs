@@ -144,90 +144,145 @@ namespace SmartStore.Data.Utilities
 		/// <returns>The total count of fixed and updated product entities</returns>
 		internal static int FixProductMainPictureIds(IDbContext context, bool initial, DateTime? ifModifiedSinceUtc = null)
 		{
-			var ctx = context as SmartObjectContext;
+            var ctx = context as SmartObjectContext;
 			if (ctx == null)
 				throw new ArgumentException("Passed context must be an instance of type '{0}'.".FormatInvariant(typeof(SmartObjectContext)), nameof(context));
 
-			var query = from p in ctx.Set<Product>().AsNoTracking()
+
+            int rowseffected = 0;
+
+            var query = from p in ctx.Set<Product>().AsNoTracking()
 						where (!initial || p.MainPictureId == null) && (ifModifiedSinceUtc == null || p.UpdatedOnUtc >= ifModifiedSinceUtc.Value)
 						orderby p.Id
-						select new { p.Id, p.MainPictureId };	
+						select new { p.Id, p.MainPictureId };
 
-			// Key = ProductId, Value = MainPictureId
-			var toUpate = new Dictionary<int, int?>();
+            int[] productIds = query.Select(x => x.Id).ToArray();
+            using (var tx = ctx.Database.BeginTransaction())
+            {
+                foreach (int productId in productIds)
+                {
+                    int pictureId = GetPoductPictureMap(ctx, productId);
+                    if (DataSettings.Current.IsMySqlServer)
+                    {
+                        rowseffected += context.ExecuteSqlCommand("Update Product Set MainPictureId = {0} WHERE Product.Id = {1}", false, null, pictureId, productId);
+                    }
+                    else
+                    {
+                        rowseffected += context.ExecuteSqlCommand("Update [Product] Set [MainPictureId] = {0} WHERE [Id] = {1}", false, null, pictureId, productId);
+                    }
+                }
+                context.SaveChanges();
+                tx.Commit();
+            }
+            return rowseffected;
+            //IDictionary<int, int> picmap = GetPoductPictureMap(ctx, productIds);
+
+
+            // Key = ProductId, Value = MainPictureId
+          //  var toUpate = new Dictionary<int, int?>();
 
 			// 1st pass
-			int pageIndex = -1;
-            while (true)
-            {
-                var products = PagedList.Create(query, ++pageIndex, 1000);
-                IDictionary<int, int> map = GetPoductPictureMap(ctx, products.Select(x => x.Id).ToArray());
+			//int pageIndex = -1;
+   //         while (true)
+   //         {
+   //             var products = PagedList.Create(query, ++pageIndex, 1000);
+   //             IDictionary<int, int> map = GetPoductPictureMap(ctx, products.Select(x => x.Id).ToArray());
 
-                foreach (var p in products)
-                {
-                    int? fixedPictureId = null;
-                    if (map.ContainsKey(p.Id))
-                    {
-                        // Product has still a pic.
-                        fixedPictureId = map[p.Id];
-                    }
+   //             foreach (var p in products)
+   //             {
+   //                 int? fixedPictureId = null;
+   //                 if (map.ContainsKey(p.Id))
+   //                 {
+   //                     // Product has still a pic.
+   //                     fixedPictureId = map[p.Id];
+   //                 }
 
-                    // Update only if fixed PictureId differs from current
-                    if (fixedPictureId != p.MainPictureId)
-                    {
-                        toUpate.Add(p.Id, fixedPictureId);
-                    }
-                }
+   //                 // Update only if fixed PictureId differs from current
+   //                 if (fixedPictureId != p.MainPictureId)
+   //                 {
+   //                     toUpate.Add(p.Id, fixedPictureId);
+   //                 }
+   //             }
 
-                if (!products.HasNextPage)
-                    break;
-            }
+   //             if (!products.HasNextPage)
+   //                 break;
+   //         }
 
                 // 2nd pass
-                foreach (var chunk in toUpate.Slice(1000))
-                {
-                    using (var tx = ctx.Database.BeginTransaction())
-                    {
-                        foreach (var kvp in chunk)
-                        {
+                //foreach (var chunk in toUpate.Slice(1000))
+                //{
+                //    using (var tx = ctx.Database.BeginTransaction())
+                //    {
+                //        foreach (var kvp in chunk)
+                //        {
 
-                            if (DataSettings.Current.IsMySqlServer)
-                            {
-                                context.ExecuteSqlCommand("Update Product Set MainPictureId = {0} WHERE Product.Id = {1}", false, null, kvp.Value, kvp.Key);
-                            }
-                            else
-                            {
-                                context.ExecuteSqlCommand("Update [Product] Set [MainPictureId] = {0} WHERE [Id] = {1}", false, null, kvp.Value, kvp.Key);
-                            }
-                        }
+                //            if (DataSettings.Current.IsMySqlServer)
+                //            {
+                //                context.ExecuteSqlCommand("Update Product Set MainPictureId = {0} WHERE Product.Id = {1}", false, null, kvp.Value, kvp.Key);
+                //            }
+                //            else
+                //            {
+                //                context.ExecuteSqlCommand("Update [Product] Set [MainPictureId] = {0} WHERE [Id] = {1}", false, null, kvp.Value, kvp.Key);
+                //            }
+                //        }
 
-                        context.SaveChanges();
-                        tx.Commit();
-                    }
-                }
+                //        context.SaveChanges();
+                //        tx.Commit();
+                //    }
+                //}
             
-			return toUpate.Count;
+			//return toUpate.Count;
 		}
 
-		private static IDictionary<int, int> GetPoductPictureMap(SmartObjectContext context, IEnumerable<int> productIds)
+		private static int GetPoductPictureMap(SmartObjectContext context, int productId)
 		{
-			var map = new Dictionary<int, int>();
+            //var map = new Dictionary<int, int>();
 
-			var query = from pp in context.Set<ProductPicture>().AsNoTracking()
-						where productIds.Contains(pp.ProductId)
-						group pp by pp.ProductId into g
-						select new
-						{
-							ProductId = g.Key,
-							PictureIds = g.OrderBy(x => x.DisplayOrder).ThenBy(x => x.Id)
-								.Take(1)
-								.Select(x => x.PictureId)
-						};
+            int picid = (from p in context.Set<ProductPicture>().AsNoTracking()
+                         where p.ProductId == productId
+                         orderby p.DisplayOrder
+                         select p.PictureId)?.Take(1).SingleOrDefault() ?? 0;
+            //return query.OrderBy(x => x.DisplayOrder).Select(x => x.PictureId).SingleOrDefault();
 
-			map = query.ToList().ToDictionary(x => x.ProductId, x => x.PictureIds.First());
+            return picid;
 
-			return map;
-		}
+
+            //var query2 = from p in query
+            //             group p by p.ProductId into g
+            //             select new
+            //             {
+            //                 ProductId = g.Key,
+            //                 PictureIds = g.OrderBy(x => x.DisplayOrder).ThenBy(x => x.Id)
+            //                     .Take(1)
+            //                     .Select(x => x.PictureId)
+            //             };
+            //group pp by pp.ProductId into g
+            //            select new
+            //            {
+            //                ProductId = g.Key,
+            //                PictureIds = g.OrderBy(x => x.DisplayOrder).ThenBy(x => x.Id)
+            //                    .Take(1)
+            //                    .Select(x => x.PictureId)
+            //            };
+
+            //map = query2.ToList().ToDictionary(x => x.ProductId, x => x.PictureIds.First());
+
+
+            //var query = from pp in context.Set<ProductPicture>().AsNoTracking()
+            //			where productIds.Contains(pp.ProductId)
+            //			group pp by pp.ProductId into g
+            //			select new
+            //			{
+            //				ProductId = g.Key,
+            //				PictureIds = g.OrderBy(x => x.DisplayOrder).ThenBy(x => x.Id)
+            //					.Take(1)
+            //					.Select(x => x.PictureId)
+            //			};
+
+            //map = query.ToList().ToDictionary(x => x.ProductId, x => x.PictureIds.First());
+
+            //return map;
+        }
 
 		#endregion
 
