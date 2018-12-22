@@ -15,7 +15,7 @@ namespace SmartStore.Core.Domain.Catalog
         /// Gets or sets the product variant attribute mapping identifier
         /// </summary>
 		[DataMember]
-		[Index("IX_ProductVariantAttributeValue_ProductVariantAttributeId_DisplayOrder", 1)]
+		[Index("IX_ProductVAV_ProductVAId_DO", 1)]
 		public int ProductVariantAttributeId { get; set; }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace SmartStore.Core.Domain.Catalog
         /// Gets or sets the display order
         /// </summary>
 		[DataMember]
-		[Index("IX_ProductVariantAttributeValue_ProductVariantAttributeId_DisplayOrder", 2)]
+		[Index("xxx", 2)]
 		public int DisplayOrder { get; set; }
 
 		/// <summary>

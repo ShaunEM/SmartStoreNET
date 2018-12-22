@@ -12,6 +12,8 @@ namespace SmartStore.ShippingByWeight.Data.Migrations
             AutomaticMigrationsEnabled = false;
             MigrationsDirectory = @"Data\Migrations";
 			ContextKey = "SmartStore.ShippingByWeight";
+
+            //SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
         }
 
         protected override void Seed(ShippingByWeightObjectContext context)

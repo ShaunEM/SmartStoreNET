@@ -47,8 +47,10 @@
 }
 	
 .star-rating:not(:checked) > label:before {
-    @include fontawesome-font("\f005", regular); // star solid
+	font-family: FontAwesome;
+	font-weight: normal;
 	font-style: normal;
+	content: "\f006";
 }
 	
 .star-rating > input:checked ~ label:before,
@@ -59,7 +61,7 @@
 .star-rating > input:checked ~ label:hover:before,
 .star-rating > input:checked ~ label:hover ~ label:before,
 .star-rating > label:hover ~ input:checked ~ label:before {
-    @include fontawesome-font("\f005", solid); // star outline
+	content: "\f005";
 }
 	
 // CURRENT STATE

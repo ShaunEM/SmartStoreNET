@@ -972,10 +972,15 @@ namespace SmartStore.Web.Controllers
         [ChildActionOnly]
         public ActionResult CheckoutProgress(CheckoutProgressStep step)
         {
-            var model = new CheckoutProgressModel
+            var model = new CheckoutProgressModel() {CheckoutProgressStep = step};
+
+            var cart = _workContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, _storeContext.CurrentStore.Id);
+            var shippingOptions = _shippingService.GetShippingOptions(cart, _workContext.CurrentCustomer.ShippingAddress, "", _storeContext.CurrentStore.Id).ShippingOptions;
+
+            if (shippingOptions.Count <= 1 && _shippingSettings.SkipShippingIfSingleOption)
             {
-                CheckoutProgressStep = step
-            };
+                model.DisplayShippingOptions = false;
+            }
 
             return PartialView(model);
         }

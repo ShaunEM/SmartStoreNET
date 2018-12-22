@@ -5,6 +5,8 @@ namespace SmartStore.Services
 {
 	public abstract class ScopedServiceBase : IScopedService
 	{
+		private bool _isInScope;
+
 		/// <summary>
 		/// Creates a long running unit of work in which cache eviction is suppressed
 		/// </summary>
@@ -12,18 +14,18 @@ namespace SmartStore.Services
 		/// <returns>A disposable unit of work</returns>
 		public IDisposable BeginScope(bool clearCache = true)
 		{
-			if (IsInScope)
+			if (_isInScope)
 			{
 				// nested batches are not supported
 				return ActionDisposable.Empty;
 			}
 
 			OnBeginScope();
-			IsInScope = true;	
+			_isInScope = true;	
 
 			return new ActionDisposable(() =>
 			{
-				IsInScope = false;
+				_isInScope = false;
 				OnEndScope();
 				if (clearCache && HasChanges)
 				{
@@ -46,13 +48,12 @@ namespace SmartStore.Services
 
 		protected bool IsInScope
 		{
-			get;
-			private set;
+			get { return _isInScope; }
 		}
 
 		public void ClearCache()
 		{
-			if (!IsInScope)
+			if (!_isInScope)
 			{
 				OnClearCache();
 				HasChanges = false;

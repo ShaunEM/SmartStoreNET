@@ -29,7 +29,7 @@ var summernote_image_upload_url;
 		dialogsInBody: true,
 		dialogsFade: true,
 		height: 300,
-		prettifyHtml: false,
+		prettifyHtml: true,
 		onCreateLink: function (url) {
 			// Prevents that summernote prepends "http://" to our links (WTF!!!)
 			var c = url[0];
@@ -116,7 +116,7 @@ var summernote_image_upload_url;
 			'arrowsAlt': 'fa fa-arrows-alt',
 			'bold': 'fa fa-bold',
 			'caret': 'fa fa-caret-down',
-			'circle': 'far fa-circle',
+			'circle': 'fa fa-circle-thin',
 			'close': 'fa fa-times',
 			'code': 'fa fa-code',
 			'eraser': 'fa fa-eraser',
@@ -129,11 +129,11 @@ var summernote_image_upload_url;
 			'menuCheck': 'fa fa-check',
 			'minus': 'fa fa-minus',
 			'orderedlist': 'fa fa-list-ol',
-			'pencil': 'fa fa-pencil-alt',
-			'picture': 'far fa-image',
+			'pencil': 'fa fa-pencil',
+			'picture': 'fa fa-picture-o',
 			'question': 'fa fa-question',
 			'redo': 'fa fa-redo',
-			'square': 'far fa-square',
+			'square': 'fa fa-square-o',
 			'strikethrough': 'fa fa-strikethrough',
 			'subscript': 'fa fa-subscript',
 			'superscript': 'fa fa-superscript',
@@ -143,7 +143,7 @@ var summernote_image_upload_url;
 			'underline': 'fa fa-underline',
 			'undo': 'fa fa-undo',
 			'unorderedlist': 'fa fa-list-ul',
-			'video': 'fa fa-video'
+			'video': 'fa fa-video-camera'
 		},
 		codemirror: {
 			mode: "htmlmixed",
@@ -173,7 +173,7 @@ var summernote_image_upload_url;
 			}
 		},
 		imageAttributes: {
-            icon: '<i class="fa fa-pencil-alt"/>',
+			icon: '<i class="fa fa-pencil"/>',
 			removeEmpty: true, // true = remove attributes | false = leave empty if present
 			disableUpload: true // true = don't display Upload Options | Display Upload Options
 		}

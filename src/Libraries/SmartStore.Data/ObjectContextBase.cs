@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Infrastructure;
+using System.Diagnostics;
 using System.Linq;
 using SmartStore.ComponentModel;
 using SmartStore.Core;
@@ -29,10 +30,10 @@ namespace SmartStore.Data
 		/// <summary>
 		/// Parameterless constructor for tooling support, e.g. EF Migrations.
 		/// </summary>
-		protected ObjectContextBase()
-			: this(GetConnectionString(), null)
+		protected ObjectContextBase(): this(GetConnectionString(), null)
 		{
-		}
+            Database.Log = sql => Debug.Write($"ObjectContextBase: {sql}");
+        }
 
 		protected ObjectContextBase(string nameOrConnectionString, string alias = null)
             : base(nameOrConnectionString)
@@ -42,7 +43,7 @@ namespace SmartStore.Data
             this.Alias = null;
 			this.DbHookHandler = NullDbHookHandler.Instance;
 
-			if (_commandTimeoutInSeconds >= 0 && DataSettings.Current.IsSqlServer)
+			if (_commandTimeoutInSeconds >= 0)
 			{
 				Database.CommandTimeout = _commandTimeoutInSeconds;
 			}
@@ -190,6 +191,7 @@ namespace SmartStore.Data
             var transactionalBehavior = doNotEnsureTransaction
                 ? TransactionalBehavior.DoNotEnsureTransaction
                 : TransactionalBehavior.EnsureTransaction;
+            // FIXME: 
             var result = this.Database.ExecuteSqlCommand(transactionalBehavior, sql, parameters);
 
             if (timeout.HasValue)

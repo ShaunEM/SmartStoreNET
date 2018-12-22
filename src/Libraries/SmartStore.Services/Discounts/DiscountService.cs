@@ -210,6 +210,8 @@ namespace SmartStore.Services.Discounts
 		private System.Diagnostics.Stopwatch _watch = new System.Diagnostics.Stopwatch();
 		public virtual bool IsDiscountValid(Discount discount, Customer customer)
         {
+			_watch.Start();
+
 			var couponCodeToValidate = "";
             if (customer != null)
 			{
@@ -217,6 +219,10 @@ namespace SmartStore.Services.Discounts
 			}			
 
             var valid = IsDiscountValid(discount, customer, couponCodeToValidate);
+
+			_watch.Stop();
+			System.Diagnostics.Debug.WriteLine("D Elapsed: {0} ms.".FormatCurrent(_watch.ElapsedMilliseconds));
+
 			return valid;
         }
 

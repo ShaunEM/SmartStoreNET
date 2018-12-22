@@ -111,6 +111,9 @@
       <HintPath>..\..\packages\JavaScriptEngineSwitcher.V8.2.4.0\lib\net45\ClearScript.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Dapper, Version=1.50.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Dapper.1.50.5\lib\net451\Dapper.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
       <Private>True</Private>
@@ -157,9 +160,14 @@
       <HintPath>..\..\packages\MsieJavaScriptEngine.2.2.1\lib\net45\MsieJavaScriptEngine.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="MySql.Data, Version=6.9.12.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MySql.Data.6.9.12\lib\net45\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data.Entity.EF6, Version=6.9.12.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MySql.Data.Entity.6.9.12\lib\net45\MySql.Data.Entity.EF6.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -283,6 +291,7 @@
     <Compile Include="Controllers\PollController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\TaskSchedulerController.cs" />
+    <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Controllers\ThemeController.cs" />
     <Compile Include="Controllers\WidgetController.cs" />
     <Compile Include="Controllers\PrivateMessagesController.cs" />
@@ -784,6 +793,8 @@
     <Content Include="App_Data\Samples\wayfarer_havana.png" />
     <Content Include="App_Data\Samples\wayfarer_havana_black.png" />
     <Content Include="App_Data\Samples\wayfarer_rayban-black.png" />
+    <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bs4\js\bootstrap.bundle.js" />
     <Content Include="Content\bs4\js\bootstrap.bundle.min.js" />
     <Content Include="Content\bs4\js\bootstrap.js" />
@@ -853,26 +864,10 @@
     <Content Include="Content\fontastic\fonts\fontastic.svg" />
     <Content Include="Content\placeholder.txt" />
     <Content Include="Content\print-rtl.css" />
+    <Content Include="Content\Site.css" />
     <Content Include="Content\vendors\aos\js\aos.js" />
     <Content Include="Content\vendors\drift\Drift.js" />
     <Content Include="Content\vendors\drift\Drift.min.js" />
-    <Content Include="Content\vendors\fa5\css\all.css" />
-    <Content Include="Content\vendors\fa5\css\all.min.css" />
-    <Content Include="Content\vendors\fa5\css\brands.css" />
-    <Content Include="Content\vendors\fa5\css\brands.min.css" />
-    <Content Include="Content\vendors\fa5\css\fontawesome.css" />
-    <Content Include="Content\vendors\fa5\css\fontawesome.min.css" />
-    <Content Include="Content\vendors\fa5\css\regular.css" />
-    <Content Include="Content\vendors\fa5\css\regular.min.css" />
-    <Content Include="Content\vendors\fa5\css\solid.css" />
-    <Content Include="Content\vendors\fa5\css\solid.min.css" />
-    <Content Include="Content\vendors\fa5\css\svg-with-js.css" />
-    <Content Include="Content\vendors\fa5\css\svg-with-js.min.css" />
-    <Content Include="Content\vendors\fa5\css\v4-shims.css" />
-    <Content Include="Content\vendors\fa5\css\v4-shims.min.css" />
-    <Content Include="Content\vendors\fa5\webfonts\fa-brands-400.svg" />
-    <Content Include="Content\vendors\fa5\webfonts\fa-regular-400.svg" />
-    <Content Include="Content\vendors\fa5\webfonts\fa-solid-900.svg" />
     <Content Include="Content\vendors\fileuploader\images\loading.gif" />
     <Content Include="Content\vendors\fileuploader\images\progressbar.gif" />
     <Content Include="Content\vendors\fileuploader\jquery.fileupload-fp.js" />
@@ -1026,43 +1021,14 @@
     <Content Include="Content\vendors\aos\scss\_core.scss" />
     <Content Include="Content\bs4\scss\utilities\_shadows.scss" />
     <Content Include="Content\shared\_rangeslider.scss" />
-    <Content Include="Content\vendors\fa5\scss\brands.scss" />
-    <Content Include="Content\vendors\fa5\scss\fontawesome.scss" />
-    <Content Include="Content\vendors\fa5\scss\regular.scss" />
-    <Content Include="Content\vendors\fa5\scss\solid.scss" />
-    <Content Include="Content\vendors\fa5\scss\v4-shims.scss" />
-    <Content Include="Content\vendors\fa5\scss\_animated.scss" />
-    <Content Include="Content\vendors\fa5\scss\_bordered-pulled.scss" />
-    <Content Include="Content\vendors\fa5\scss\_core.scss" />
-    <Content Include="Content\vendors\fa5\scss\_fixed-width.scss" />
-    <Content Include="Content\vendors\fa5\scss\_icons.scss" />
-    <Content Include="Content\vendors\fa5\scss\_larger.scss" />
-    <Content Include="Content\vendors\fa5\scss\_list.scss" />
-    <Content Include="Content\vendors\fa5\scss\_mixins.scss" />
-    <Content Include="Content\vendors\fa5\scss\_rotated-flipped.scss" />
-    <Content Include="Content\vendors\fa5\scss\_screen-reader.scss" />
-    <Content Include="Content\vendors\fa5\scss\_shims.scss" />
-    <Content Include="Content\vendors\fa5\scss\_stacked.scss" />
-    <Content Include="Content\vendors\fa5\scss\_variables.scss" />
-    <Content Include="Content\vendors\fa5\webfonts\fa-brands-400.eot" />
-    <Content Include="Content\vendors\fa5\webfonts\fa-brands-400.ttf" />
-    <Content Include="Content\vendors\fa5\webfonts\fa-brands-400.woff" />
-    <Content Include="Content\vendors\fa5\webfonts\fa-brands-400.woff2" />
-    <Content Include="Content\vendors\fa5\webfonts\fa-regular-400.eot" />
-    <Content Include="Content\vendors\fa5\webfonts\fa-regular-400.ttf" />
-    <Content Include="Content\vendors\fa5\webfonts\fa-regular-400.woff" />
-    <Content Include="Content\vendors\fa5\webfonts\fa-regular-400.woff2" />
-    <Content Include="Content\vendors\fa5\webfonts\fa-solid-900.eot" />
-    <Content Include="Content\vendors\fa5\webfonts\fa-solid-900.ttf" />
-    <Content Include="Content\vendors\fa5\webfonts\fa-solid-900.woff" />
-    <Content Include="Content\vendors\fa5\webfonts\fa-solid-900.woff2" />
-    <Content Include="Content\shared\_fa.scss" />
-    <Content Include="App_Data\icons.json" />
     <None Include="Content\vendors\x-editable\README.txt" />
     <Content Include="favicon.ico" />
     <Content Include="favicon.readme.txt" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Refresh.html" />
-    <Content Include="Config\ConnectionStrings.config" />
+    <Content Include="Config\ConnectionStrings.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Config\SessionState.config" />
     <Content Include="Content\vendors\jquery\jquery-3.2.1.js" />
     <Content Include="Content\vendors\jquery\jquery-3.2.1.min.js" />
@@ -1196,10 +1162,16 @@
     <None Include="Content\vendors\jquery\jquery.validate-vsdoc.js" />
     <Content Include="Content\vendors\jquery\jquery.validate.js" />
     <Content Include="Content\vendors\jquery\jquery.validate.min.js" />
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="Scripts\jquery-1.10.2.js" />
+    <Content Include="Scripts\jquery-1.10.2.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.custom.js" />
     <Content Include="Content\vendors\jquery\jquery.validate.unobtrusive.js" />
     <Content Include="Content\vendors\jquery\jquery.validate.unobtrusive.min.js" />
     <Content Include="Content\vendors\modernizr\modernizr.js" />
+    <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\smartstore.rangeslider.js" />
     <Content Include="Scripts\smartstore.keynav.js" />
     <Content Include="Scripts\smartstore.parallax.js" />
@@ -1249,7 +1221,10 @@
     <Content Include="Themes\Flex\Content\images\star-off.png" />
     <Content Include="Themes\Flex\Content\images\star-on-12.png" />
     <Content Include="Themes\Flex\Content\images\star-on.png" />
-    <Content Include="Plugins\Web.config" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Scripts\jquery-1.10.2.min.map" />
     <None Include="Themes\Flex\Content\compiled\theme.css" />
     <Content Include="Themes\Flex\Content\images\grippy.png" />
     <Content Include="Themes\Flex\Content\_megamenu.scss" />
@@ -1828,8 +1803,10 @@
     <Content Include="Themes\Flex\Content\_accordion.scss">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Shared\Partials\FontAwesomeIcon.cshtml" />
-    <Content Include="Views\Shared\Partials\_Assets.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\FontAwesomeIcon.cshtml" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Test\Index.cshtml" />
     <None Include="Web.EFMigrations.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1856,6 +1833,10 @@
     <ProjectReference Include="..\SmartStore.Web.Framework\SmartStore.Web.Framework.csproj">
       <Project>{75fd4163-333c-4dd5-854d-2ef294e45d94}</Project>
       <Name>SmartStore.Web.Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="Administration\SmartStore.Admin.csproj">
+      <Project>{152c761a-dd2e-4c1f-af89-dfb2547a3bca}</Project>
+      <Name>SmartStore.Admin</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

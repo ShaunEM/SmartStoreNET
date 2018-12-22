@@ -36,13 +36,10 @@ namespace SmartStore.Web.Controllers
         private readonly IInstallationLocalizationService _locService;
 		private readonly IAsyncState _asyncState;
 
-		public InstallController(
-            IInstallationLocalizationService locService,
-			IAsyncState asyncState)
+		public InstallController(IInstallationLocalizationService locService, IAsyncState asyncState)
         {
 			_locService = locService;
 			_asyncState = asyncState;
-
 			Logger = NullLogger.Instance;
         }
 
@@ -144,10 +141,7 @@ namespace SmartStore.Web.Controllers
         /// <param name="timeout">The connection timeout</param>
         /// <returns>Connection string</returns>
         [NonAction]
-        protected string CreateConnectionString(
-            bool trustedConnection,
-            string serverName, string databaseName, 
-            string userName, string password, int timeout = 15)
+        protected string CreateConnectionString(bool trustedConnection, string serverName, string databaseName, string userName, string password, int timeout = 15)
         {
             var builder = new SqlConnectionStringBuilder();
             builder.IntegratedSecurity = trustedConnection;
@@ -187,9 +181,12 @@ namespace SmartStore.Web.Controllers
                 AdminEmail = _locService.GetResource("AdminEmailValue"),
                 //AdminPassword = "admin",
                 //ConfirmPassword = "admin",
+                AdminPassword = "admin",
+                ConfirmPassword = "admin",
                 InstallSampleData = false,
                 DatabaseConnectionString = "",
-                DataProvider = "sqlce", // "sqlserver",
+                //DataProvider = "sqlce", // "sqlserver",
+                DataProvider = "MySql.Data.MySqlClient",
                 SqlAuthenticationType = "sqlauthentication",
                 SqlConnectionInfo = "sqlconnectioninfo_values",
                 SqlServerCreateDatabase = false,
@@ -273,10 +270,22 @@ namespace SmartStore.Web.Controllers
 			//set page timeout to 5 minutes
 			this.Server.ScriptTimeout = 300;
 
-			if (model.DatabaseConnectionString != null)
+
+            if (model.DatabaseConnectionString != null)
 			{
 				model.DatabaseConnectionString = model.DatabaseConnectionString.Trim();
 			}
+
+
+
+
+
+
+
+
+
+
+
 
 			//SQL Server
 			if (model.DataProvider.Equals("sqlserver", StringComparison.InvariantCultureIgnoreCase))
@@ -354,13 +363,99 @@ namespace SmartStore.Web.Controllers
 			}
 
 
-			//Consider granting access rights to the resource to the ASP.NET request identity. 
-			//ASP.NET has a base process identity 
-			//(typically {MACHINE}\ASPNET on IIS 5 or Network Service on IIS 6 and IIS 7, 
-			//and the configured application pool identity on IIS 7.5) that is used if the application is not impersonating.
-			//If the application is impersonating via <identity impersonate="true"/>, 
-			//the identity will be the anonymous user (typically IUSR_MACHINENAME) or the authenticated request user.
-			var webHelper = scope.Resolve<IWebHelper>();
+
+            // MOD: Added below
+            //if (model.DataProvider.Equals("mysql", StringComparison.InvariantCultureIgnoreCase))
+            //{
+            //    if (model.SqlConnectionInfo.Equals("sqlconnectioninfo_raw", StringComparison.InvariantCultureIgnoreCase))
+            //    {
+            //        //raw connection string
+            //        if (string.IsNullOrEmpty(model.DatabaseConnectionString))
+            //        {
+            //            UpdateResult(x =>
+            //            {
+            //                x.Errors.Add(_locService.GetResource("ConnectionStringRequired"));
+            //                Logger.Error(x.Errors.Last());
+            //            });
+            //        }
+
+            //        try
+            //        {
+            //            //try to create connection string  ???
+            //            new SqlConnectionStringBuilder(model.DatabaseConnectionString);
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            UpdateResult(x =>
+            //            {
+            //                x.Errors.Add(_locService.GetResource("ConnectionStringWrongFormat"));
+            //                Logger.Error(ex, x.Errors.Last());
+            //            });
+            //        }
+            //    }
+            //    else
+            //    {
+            //        //values
+            //        if (string.IsNullOrEmpty(model.SqlServerName))
+            //        {
+            //            UpdateResult(x =>
+            //            {
+            //                x.Errors.Add(_locService.GetResource("SqlServerNameRequired"));
+            //                Logger.Error(x.Errors.Last());
+            //            });
+            //        }
+
+            //        if (string.IsNullOrEmpty(model.SqlDatabaseName))
+            //        {
+            //            UpdateResult(x =>
+            //            {
+            //                x.Errors.Add(_locService.GetResource("DatabaseNameRequired"));
+            //                Logger.Error(x.Errors.Last());
+            //            });
+            //        }
+
+            //        //authentication type
+            //        if (model.SqlAuthenticationType.Equals("sqlauthentication", StringComparison.InvariantCultureIgnoreCase))
+            //        {
+            //            //SQL authentication
+            //            if (string.IsNullOrEmpty(model.SqlServerUsername))
+            //            {
+            //                UpdateResult(x =>
+            //                {
+            //                    x.Errors.Add(_locService.GetResource("SqlServerUsernameRequired"));
+            //                    Logger.Error(x.Errors.Last());
+            //                });
+            //            }
+
+            //            if (string.IsNullOrEmpty(model.SqlServerPassword))
+            //            {
+            //                UpdateResult(x =>
+            //                {
+            //                    x.Errors.Add(_locService.GetResource("SqlServerPasswordRequired"));
+            //                    Logger.Error(x.Errors.Last());
+            //                });
+            //            }
+            //        }
+            //    }
+            //}
+
+
+
+
+
+
+
+
+
+
+
+            //Consider granting access rights to the resource to the ASP.NET request identity. 
+            //ASP.NET has a base process identity 
+            //(typically {MACHINE}\ASPNET on IIS 5 or Network Service on IIS 6 and IIS 7, 
+            //and the configured application pool identity on IIS 7.5) that is used if the application is not impersonating.
+            //If the application is impersonating via <identity impersonate="true"/>, 
+            //the identity will be the anonymous user (typically IUSR_MACHINENAME) or the authenticated request user.
+            var webHelper = scope.Resolve<IWebHelper>();
 			//validate permissions
 			var dirsToCheck = FilePermissionHelper.GetDirectoriesWrite(webHelper);
 			foreach (string dir in dirsToCheck)
@@ -409,7 +504,6 @@ namespace SmartStore.Web.Controllers
 					if (model.DataProvider.Equals("sqlserver", StringComparison.InvariantCultureIgnoreCase))
 					{
 						//SQL Server
-
 						if (model.SqlConnectionInfo.Equals("sqlconnectioninfo_raw", StringComparison.InvariantCultureIgnoreCase))
 						{
 							//raw connection string
@@ -473,7 +567,11 @@ namespace SmartStore.Web.Controllers
 							}
 						}
 					}
-					else
+                    else if (model.DataProvider.Equals("mysql", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        connectionString = model.DatabaseConnectionString;
+                    }
+                    else
 					{
 						// SQL CE
 						string databaseFileName = "SmartStore.Db.sdf";
@@ -728,6 +826,25 @@ namespace SmartStore.Web.Controllers
             return RedirectToAction("Index", "Home");
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public class InstallationResult : ICloneable<InstallationResult>
     {

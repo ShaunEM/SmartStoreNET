@@ -25,21 +25,11 @@ namespace SmartStore.Core.Search
 		/// </summary>
 		bool Exists { get; }
 
-        /// <summary>
-        /// Gets the size of the index in bytes.
-        /// </summary>
-        long IndexSize { get; }
-
-        /// <summary>
-        /// The identifier of the last added document.
-        /// </summary>
-        int LastAddedDocumentId { get; }
-
-        /// <summary>
-        /// Gets the total number of indexed documents
-        /// </summary>
-        /// <param name="documentType">Type of document, use <c>null</c> to get all documents</param>
-        int GetDocumentCount(SearchDocumentType? documentType);
+		/// <summary>
+		/// Gets the total number of indexed documents
+		/// </summary>
+		/// <param name="documentType">Type of document, use <c>null</c> to get all documents</param>
+		int GetDocumentCount(SearchDocumentType? documentType);
 
 		/// <summary>
 		/// Returns every field's name available in the index

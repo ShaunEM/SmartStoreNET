@@ -10,8 +10,11 @@ namespace SmartStore.Core
 {
     public class PagedList<T> : IPagedList<T>, IReadOnlyList<T>, IReadOnlyCollection<T>
     {
-		private bool _isEfQuery;
+		private IQueryable<T> _query;
 		private bool _queryIsPagedAlready;
+
+		private int _pageIndex;
+		private int _pageSize;
 		private int? _totalCount;
 
 		private List<T> _list;
@@ -37,13 +40,12 @@ namespace SmartStore.Core
 			Guard.NotNull(source, nameof(source));
 			Guard.PagingArgsValid(pageIndex, pageSize, "pageIndex", "pageSize");
 
-			SourceQuery = source;
-			PageIndex = pageIndex;
-			PageSize = pageSize;
-
-			_totalCount = totalCount;
+			_query = source;
 			_queryIsPagedAlready = totalCount.HasValue;
-			_isEfQuery = source.Provider is IDbAsyncQueryProvider;
+
+			_pageIndex = pageIndex;
+			_pageSize = pageSize;
+			_totalCount = totalCount;
 		}
 
 		private void EnsureIsLoaded()
@@ -52,49 +54,52 @@ namespace SmartStore.Core
 			{
 				if (_totalCount == null)
 				{
-					_totalCount = SourceQuery.Count();
+					_totalCount = _query.Count();
 				}
 
 				if (_queryIsPagedAlready)
 				{
-					_list = SourceQuery.ToList();
+					_list = _query.ToList();
 				}
 				else
 				{
-					_list = ApplyPaging(SourceQuery).ToList();
+					_list = ApplyPaging(_query).ToList();
 				}
 			}
 		}
 
 		#region IPageable Members
 
-		public IQueryable<T> SourceQuery { get; private set; }
+		public IQueryable<T> SourceQuery
+		{
+			get { return _query; }
+		}
 
 		public IPagedList<T> AlterQuery(Func<IQueryable<T>, IQueryable<T>> alterer)
 		{
-			var result = alterer?.Invoke(SourceQuery);
-			SourceQuery = result ?? throw new InvalidOperationException("The '{0}' delegate must not return NULL.".FormatInvariant(nameof(alterer)));
+			var result = alterer?.Invoke(_query);
+			_query = result ?? throw new InvalidOperationException("The '{0}' delegate must not return NULL.".FormatInvariant(nameof(alterer)));
 
 			return this;
 		}
 
 		public IQueryable<T> ApplyPaging(IQueryable<T> query)
 		{
-			if (PageIndex == 0 && PageSize == int.MaxValue)
+			if (_pageIndex == 0 && _pageSize == int.MaxValue)
 			{
 				// Paging unnecessary
 				return query;
 			}
 			else
 			{
-				var skip = PageIndex * PageSize;
-				if (_isEfQuery)
+				var skip = _pageIndex * _pageSize;
+				if (query.Provider is IDbAsyncQueryProvider)
 				{
-					return query.Skip(() => skip).Take(() => PageSize);
+					return query.Skip(() => skip).Take(() => _pageSize);
 				}
 				else
 				{
-					return query.Skip(skip).Take(PageSize);
+					return query.Skip(skip).Take(_pageSize);
 				}
 			}
 		}
@@ -112,17 +117,25 @@ namespace SmartStore.Core
 			return this;
 		}
 
-		public int PageIndex { get; set; }
+		public int PageIndex
+        {
+            get { return _pageIndex; }
+            set { _pageIndex = value; }
+        }
 
-		public int PageSize { get; set; }
+        public int PageSize
+        {
+			get { return _pageSize; }
+			set { _pageSize = value; }
+		}
 
-		public int TotalCount
+        public int TotalCount
         {
             get
 			{
 				if (!_totalCount.HasValue)
 				{
-					_totalCount = SourceQuery.Count();
+					_totalCount = _query.Count();
 				}
 
 				return _totalCount.Value;

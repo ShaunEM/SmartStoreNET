@@ -94,9 +94,14 @@
       <Private>True</Private>
       <HintPath>..\..\packages\Microsoft.SqlServer.Scripting.11.0.2100.61\lib\Microsoft.SqlServer.Smo.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="MySql.Data, Version=6.9.12.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MySql.Data.6.9.12\lib\net45\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data.Entity.EF6, Version=6.9.12.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MySql.Data.Entity.6.9.12\lib\net45\MySql.Data.Entity.EF6.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -640,18 +645,12 @@
     <Compile Include="Migrations\201811061745204_IsSystemProductIndex.Designer.cs">
       <DependentUpon>201811061745204_IsSystemProductIndex.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201811082148279_LocalizedPropertyKeyGroupIndex.cs" />
-    <Compile Include="Migrations\201811082148279_LocalizedPropertyKeyGroupIndex.Designer.cs">
-      <DependentUpon>201811082148279_LocalizedPropertyKeyGroupIndex.cs</DependentUpon>
+    <Compile Include="Migrations\201812212031185_UpdateToMySQL.cs" />
+    <Compile Include="Migrations\201812212031185_UpdateToMySQL.Designer.cs">
+      <DependentUpon>201812212031185_UpdateToMySQL.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201811161142587_TaskHistoryErrorLength.cs" />
-    <Compile Include="Migrations\201811161142587_TaskHistoryErrorLength.Designer.cs">
-      <DependentUpon>201811161142587_TaskHistoryErrorLength.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201811202204501_ProductIndexSeekExport.cs" />
-    <Compile Include="Migrations\201811202204501_ProductIndexSeekExport.Designer.cs">
-      <DependentUpon>201811202204501_ProductIndexSeekExport.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="MySQLDataProvider.cs" />
     <Compile Include="ObjectContextBase.SaveChanges.cs" />
     <Compile Include="Setup\Builder\ActivityLogTypeMigrator.cs" />
     <Compile Include="Setup\Builder\PermissionMigrator.cs" />
@@ -1161,14 +1160,8 @@
     <EmbeddedResource Include="Migrations\201811061745204_IsSystemProductIndex.resx">
       <DependentUpon>201811061745204_IsSystemProductIndex.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201811082148279_LocalizedPropertyKeyGroupIndex.resx">
-      <DependentUpon>201811082148279_LocalizedPropertyKeyGroupIndex.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201811161142587_TaskHistoryErrorLength.resx">
-      <DependentUpon>201811161142587_TaskHistoryErrorLength.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201811202204501_ProductIndexSeekExport.resx">
-      <DependentUpon>201811202204501_ProductIndexSeekExport.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201812212031185_UpdateToMySQL.resx">
+      <DependentUpon>201812212031185_UpdateToMySQL.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Sql\Indexes.sql" />
     <EmbeddedResource Include="Sql\StoredProcedures.sql" />

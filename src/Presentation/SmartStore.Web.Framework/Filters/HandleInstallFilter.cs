@@ -17,7 +17,10 @@ namespace SmartStore.Web.Framework.Filters
 				return;
 			}
 
-			if (!DataSettings.DatabaseIsInstalled() && controllerName != "Install")
+
+
+            // MODE: Dont route to install if test
+			if (!DataSettings.DatabaseIsInstalled() && controllerName != "Install" && controllerName != "Test")
 			{
 				filterContext.Result = new RedirectToRouteResult(
 					new RouteValueDictionary {

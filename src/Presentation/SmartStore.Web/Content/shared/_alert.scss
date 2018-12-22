@@ -26,7 +26,7 @@
 		display: block;
 		position: absolute;
 		color: #fff;
-        @include fontawesome-font('', regular);
+		font-family: FontAwesome;
 		left: 0;
 		top: 50%;
 		font-size: 24px;

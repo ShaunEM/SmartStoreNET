@@ -84,7 +84,7 @@
         @{ Html.RenderWidget("categorydetails_top");}
 
         @* Description *@
-        @if (!string.IsNullOrWhiteSpace(Model.Description.Value))
+        @if (!String.IsNullOrWhiteSpace(Model.Description.Value))
         {
             <div @Html.LanguageAttributes(Model.Description) class="category-description lead hide-on-active-filter html-editor-content">
                 @Html.Raw(Html.CollapsedText(Model.Description))

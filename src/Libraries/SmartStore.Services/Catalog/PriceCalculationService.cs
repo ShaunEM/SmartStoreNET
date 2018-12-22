@@ -432,7 +432,7 @@ namespace SmartStore.Services.Catalog
 				x => _manufacturerService.GetProductManufacturersByProductIds(x),
 				x => _productService.GetAppliedDiscountsByProductIds(x),
 				x => _productService.GetBundleItemsByProductIds(x, true),
-                x => _productService.GetAssociatedProductsByProductIds(x)
+                x => _productService.GetAssociatedProducts(x)
 			);
 
 			return context;
@@ -712,29 +712,26 @@ namespace SmartStore.Services.Catalog
                 context = CreatePriceCalculationContext(customer: customer);
             }
 
-            if (product.ProductType == ProductType.BundledProduct)
-            {
+			if (product.ProductType == ProductType.BundledProduct)
+			{
                 var bundleItems = context.ProductBundleItems
                     .GetOrLoad(product.Id)
                     .Select(x => new ProductBundleItemData(x))
                     .ToList();
-
-                var productIds = bundleItems.Select(x => x.Item.ProductId).ToList();
-                productIds.Add(product.Id);
-                context.Collect(productIds);
+                var bundleItemContext = CreatePriceCalculationContext(bundleItems.Select(x => x.Item.Product), customer);
 
                 // Fetch bundleItems.AdditionalCharge for all bundle items.
                 foreach (var bundleItem in bundleItems.Where(x => x.Item.Product.CanBeBundleItem()))
-                {
-                    var unused = GetPreselectedPrice(bundleItem.Item.Product, customer, currency, context, bundleItem, bundleItems);
-                }
+				{
+					var unused = GetPreselectedPrice(bundleItem.Item.Product, customer, currency, bundleItemContext, bundleItem, bundleItems);
+				}
 
-                result = GetPreselectedPrice(product, customer, currency, context, null, bundleItems);
-            }
-            else
-            {
-                result = GetPreselectedPrice(product, customer, currency, context, null, null);
-            }
+				result = GetPreselectedPrice(product, customer, currency, context, null, bundleItems);
+			}
+			else
+			{
+				result = GetPreselectedPrice(product, customer, currency, context, null, null);
+			}
 
 			return result;
 		}

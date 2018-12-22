@@ -157,9 +157,8 @@ namespace SmartStore.Services.Catalog
         /// Gets products that are assigned to group products.
         /// </summary>
         /// <param name="productIds">Grouped product identifiers.</param>
-        /// <param name="showHidden">A value indicating whether to show hidden records.</param>
         /// <returns>Map of associated products.</returns>
-        Multimap<int, Product> GetAssociatedProductsByProductIds(int[] productIds, bool showHidden = false);
+        Multimap<int, Product> GetAssociatedProducts(int[] productIds);
 
         /// <summary>
         /// Get applied discounts by product identifiers

@@ -30,6 +30,8 @@ namespace SmartStore.Data
                     return new SqlServerDataProvider();
                 case "sqlce":
                     return new SqlCeDataProvider();
+                case "mysql":
+                    return new MySQLDataProvider();
                 default:
                     throw new SmartException(string.Format("Unsupported dataprovider name: {0}", providerName));
             }

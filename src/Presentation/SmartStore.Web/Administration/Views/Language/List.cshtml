@@ -2,8 +2,6 @@
 @model List<LanguageModel>
 @{
     ViewBag.Title = T("Admin.Configuration.Languages").Text;
-
-    var defaultLanguageNote = ViewBag.DefaultLanguageNote as string;
 }
 <div class="section-header">
     <div class="title">
@@ -20,12 +18,6 @@
 
 <div>
 	<h5 class="mb-3">@T("Admin.Configuration.Languages.InstalledLanguages")</h5>
-    @if (defaultLanguageNote.HasValue())
-    {
-        <div class="alert alert-info">
-            @Html.Raw(defaultLanguageNote)
-        </div>
-    }
 
 	<div class="table-responsive">
 		<table class="table admin-table installed-languages-list language-list">
@@ -100,7 +92,10 @@
 <script type="text/javascript">
     $(document).ready(function () {
 
-        // Load available languages.
+        var downloadProgressInterval = null,
+            downloadProgressIntervalAccess = true;
+
+        // Load available languages
 	    $({}).doAjax({
 	        url: '@Url.Action("AvailableLanguages")',
 	        smallIcon: '#AvailableLanguages',
@@ -109,7 +104,7 @@
 	        }
 	    });
 
-        // Watch language download progress.
+        // Watch language download progress
 		SmartStore.Admin.TaskWatcher.startWatching({
             context: $('#AvailableLanguages'),
             elementsSelector: '.task-progress',

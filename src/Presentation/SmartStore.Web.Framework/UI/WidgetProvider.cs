@@ -41,16 +41,18 @@ namespace SmartStore.Web.Framework.UI
 				_zoneWidgetsMap = new Multimap<string, WidgetRouteInfo>();
 			}
 
+			var routeInfo = new WidgetRouteInfo
+			{
+				ActionName = actionName,
+				ControllerName = controllerName,
+				RouteValues = routeValues ?? new RouteValueDictionary(),
+				Order = order
+			};
+
 			foreach (var zone in widgetZones)
 			{
 				if (zone.HasValue())
-					_zoneWidgetsMap.Add(zone, new WidgetRouteInfo
-					{
-						ActionName = actionName,
-						ControllerName = controllerName,
-						RouteValues = new RouteValueDictionary(routeValues ?? new RouteValueDictionary()),
-						Order = order
-					});
+					_zoneWidgetsMap.Add(zone, routeInfo);
 			}	
 		}
 

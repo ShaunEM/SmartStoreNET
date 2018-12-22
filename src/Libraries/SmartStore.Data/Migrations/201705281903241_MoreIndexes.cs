@@ -13,11 +13,15 @@ namespace SmartStore.Data.Migrations
 				// Avoid "Column 'Name' in table 'dbo.ProductVariantAttributeValue' is of a type that is invalid for use as a key column in an index".
 				Sql("If -1 = (SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'ProductVariantAttributeValue' AND COLUMN_NAME = 'Name') ALTER TABLE [dbo].[ProductVariantAttributeValue] ALTER COLUMN [Name] nvarchar(4000) NULL;");
 			}
-
-			CreateIndex("dbo.Product_Category_Mapping", "IsFeaturedProduct");
+            else if (HostingEnvironment.IsHosted && DataSettings.Current.IsMySqlServer)
+            {
+                // Avoid "Column 'Name' in table 'dbo.ProductVariantAttributeValue' is of a type that is invalid for use as a key column in an index".
+                //Sql("If -1 = (SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'ProductVariantAttributeValue' AND COLUMN_NAME = 'Name') ALTER TABLE [dbo].[ProductVariantAttributeValue] ALTER COLUMN [Name] nvarchar(4000) NULL;");
+            }
+            CreateIndex("dbo.Product_Category_Mapping", "IsFeaturedProduct");
 			CreateIndex("dbo.Product_Manufacturer_Mapping", "IsFeaturedProduct");
 			CreateIndex("dbo.SpecificationAttribute", "AllowFiltering");
-			CreateIndex("dbo.Product_ProductAttribute_Mapping", "AttributeControlTypeId");
+			//CreateIndex("dbo.ProductVariantAttributeValue", "AttributeControlTypeId");
 			CreateIndex("dbo.ProductAttribute", "AllowFiltering");
 			CreateIndex("dbo.ProductVariantAttributeValue", "Name");
 			CreateIndex("dbo.ProductVariantAttributeValue", "ValueTypeId");
@@ -28,7 +32,7 @@ namespace SmartStore.Data.Migrations
 			DropIndex("dbo.ProductVariantAttributeValue", new[] { "ValueTypeId" });
 			DropIndex("dbo.ProductVariantAttributeValue", new[] { "Name" });
 			DropIndex("dbo.ProductAttribute", new[] { "AllowFiltering" });
-			DropIndex("dbo.Product_ProductAttribute_Mapping", new[] { "AttributeControlTypeId" });
+			DropIndex("dbo.ProductVariantAttributeValue", new[] { "AttributeControlTypeId" });
 			DropIndex("dbo.SpecificationAttribute", new[] { "AllowFiltering" });
 			DropIndex("dbo.Product_Manufacturer_Mapping", new[] { "IsFeaturedProduct" });
 			DropIndex("dbo.Product_Category_Mapping", new[] { "IsFeaturedProduct" });

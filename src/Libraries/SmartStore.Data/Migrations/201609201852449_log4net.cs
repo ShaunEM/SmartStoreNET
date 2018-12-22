@@ -19,6 +19,10 @@ namespace SmartStore.Data.Migrations
                     Sql("IF EXISTS (SELECT * FROM sys.indexes WHERE name='IX_Log_ContentHash' AND object_id = OBJECT_ID('[dbo].[Log]')) DROP INDEX [IX_Log_ContentHash] ON [dbo].[Log];");
                     Sql(@"TRUNCATE Table [Log]");
                 }
+                else if (DataSettings.Current.IsMySqlServer)
+                {
+
+                }
                 else
                 {
                     Sql(@"SET LOCK_TIMEOUT 20000;");

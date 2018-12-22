@@ -208,16 +208,14 @@ namespace SmartStore.Services.Media
 		public virtual byte[] FindEqualPicture(byte[] pictureBinary, IEnumerable<Picture> pictures, out int equalPictureId)
 		{
 			equalPictureId = 0;
-
-			var myStream = new MemoryStream(pictureBinary);
-
 			try
 			{
 				foreach (var picture in pictures)
 				{
-					myStream.Seek(0, SeekOrigin.Begin);
+					var otherPictureBinary = LoadPictureBinary(picture);
 
-					using (var otherStream = OpenPictureStream(picture))
+					using (var myStream = new MemoryStream(pictureBinary))
+					using (var otherStream = new MemoryStream(otherPictureBinary))
 					{
 						if (myStream.ContentsEqual(otherStream))
 						{
@@ -232,10 +230,6 @@ namespace SmartStore.Services.Media
 			catch
 			{
 				return null;
-			}
-			finally
-			{
-				myStream.Dispose();
 			}
 		}
 
@@ -560,7 +554,7 @@ namespace SmartStore.Services.Media
 						select p;
 
 			if (recordsToReturn > 0)
-				query = query.Take(() => recordsToReturn);
+				query = query.Take(recordsToReturn);
 
 			var pics = query.ToList();
 			return pics;
@@ -590,7 +584,7 @@ namespace SmartStore.Services.Media
 							ProductId = g.Key,
 							Pictures = g.OrderBy(x => x.DisplayOrder)
 								.Take(take)
-								.Select(x => new { x.PictureId, x.ProductId })
+								.Select(x => new { PictureId = x.PictureId, ProductId = x.ProductId })
 						};
 
 			var groupingResult = query.ToDictionary(x => x.ProductId, x => x.Pictures);

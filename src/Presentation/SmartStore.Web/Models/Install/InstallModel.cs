@@ -22,7 +22,7 @@ namespace SmartStore.Web.Models.Install
         public string AdminEmail { get; set; }
         [AllowHtml]
         [DataType(DataType.Password)]
-        public string AdminPassword { get; set; }
+        public string AdminPassword { get; set; } 
         [AllowHtml]
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
@@ -30,11 +30,13 @@ namespace SmartStore.Web.Models.Install
 
         [AllowHtml]
         public string DatabaseConnectionString { get; set; }
-        public string DataProvider { get; set; }
+        public string DataProvider { get; set; } 
+
+
         //SQL Server properties
         public string SqlConnectionInfo { get; set; }
         [AllowHtml]
-        public string SqlServerName { get; set; }
+        public string SqlServerName { get; set; }  
         [AllowHtml]
         public string SqlDatabaseName { get; set; }
         [AllowHtml]

@@ -28,6 +28,11 @@ using SmartStore.Web.Framework.Validators;
 using System.Net;
 using FluentValidation;
 using SmartStore.Web.Framework;
+using System.Data.Entity;
+using SmartStore.Core.Domain.Catalog;
+using SmartStore.Data.Migrations;
+using System.Data.Entity.Migrations;
+using System.Diagnostics;
 
 namespace SmartStore.Web
 {
@@ -36,7 +41,86 @@ namespace SmartStore.Web
 
 	public class MvcApplication : System.Web.HttpApplication
 	{
-		public static void RegisterGlobalFilters(GlobalFilterCollection filters, IEngine engine)
+        protected void Application_Start()
+        {
+            // SSL & TLS
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, errors) => true;
+
+
+            // we use our own mobile devices support (".Mobile" is reserved). that's why we disable it.
+            var mobileDisplayMode = DisplayModeProvider.Instance.Modes.FirstOrDefault(x => x.DisplayModeId == DisplayModeProvider.MobileDisplayModeId);
+            if (mobileDisplayMode != null)
+            {
+                DisplayModeProvider.Instance.Modes.Remove(mobileDisplayMode);
+            }
+           
+            bool installed = DataSettings.DatabaseIsInstalled();
+
+            if (installed)
+            {
+                // Remove all view engines
+                ViewEngines.Engines.Clear();
+            }
+
+            // Initialize engine context
+            var engine = EngineContext.Initialize(false);
+
+            // Model binders
+            ModelBinders.Binders.DefaultBinder = new SmartModelBinder();
+
+            // Add some functionality on top of the default ModelMetadataProvider
+            ModelMetadataProviders.Current = new SmartMetadataProvider();
+
+            // Register MVC areas
+            AreaRegistration.RegisterAllAreas();
+
+            // Fluent validation
+            InitializeFluentValidator();
+
+            // Routes
+            RegisterRoutes(RouteTable.Routes, engine, installed);
+
+            // localize MVC resources
+            ClientDataTypeModelValidatorProvider.ResourceClassKey = "MvcLocalization";
+            DefaultModelBinder.ResourceClassKey = "MvcLocalization";
+            ErrorMessageProvider.SetResourceClassKey("MvcLocalization");
+
+            // Register JsEngine
+            RegisterJsEngines();
+
+            // VPPs
+            RegisterVirtualPathProviders();
+
+            if (installed)
+            {
+                // register our themeable razor view engine we use
+                ViewEngines.Engines.Add(new ThemeableRazorViewEngine());
+
+                // Global filters
+                RegisterGlobalFilters(GlobalFilters.Filters, engine);
+
+                // Bundles
+                RegisterBundles(BundleTable.Bundles, engine);
+
+                // "throw-away" filter for task scheduler initialization (the filter removes itself when processed)
+                GlobalFilters.Filters.Add(new InitializeSchedulerFilter(), int.MinValue);
+
+                // register AutoMapper class maps
+                RegisterClassMaps(engine);
+            }
+            else
+            {
+                // app not installed
+
+                // Install filter
+                GlobalFilters.Filters.Add(new HandleInstallFilter(), -1000);
+            }
+        }
+
+
+
+        public static void RegisterGlobalFilters(GlobalFilterCollection filters, IEngine engine)
 		{
 			var eventPublisher = engine.Resolve<IEventPublisher>();
 			eventPublisher.Publish(new AppRegisterGlobalFiltersEvent
@@ -71,13 +155,14 @@ namespace SmartStore.Web
 
 			if (profileTypes.Any())
 			{
-				Mapper.Initialize(cfg => {
-					foreach (var profileType in profileTypes)
-					{
-						cfg.AddProfile(profileType);
-					}
-				});
-			}
+                Mapper.Initialize(cfg =>
+                {
+                    foreach (var profileType in profileTypes)
+                    {
+                        cfg.AddProfile(profileType);
+                    }
+                });
+            }
 		}
 
 		public static void RegisterJsEngines()
@@ -94,81 +179,22 @@ namespace SmartStore.Web
 			engineSwitcher.DefaultEngineName = V8JsEngine.EngineName;
 		}
 
-		protected void Application_Start()
-		{
-			// SSL & TLS
-			ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
-			ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, errors) => true;
-			
-			// we use our own mobile devices support (".Mobile" is reserved). that's why we disable it.
-			var mobileDisplayMode = DisplayModeProvider.Instance.Modes.FirstOrDefault(x => x.DisplayModeId == DisplayModeProvider.MobileDisplayModeId);
-			if (mobileDisplayMode != null)
-				DisplayModeProvider.Instance.Modes.Remove(mobileDisplayMode);
 
-			bool installed = DataSettings.DatabaseIsInstalled();
 
-			if (installed)
-			{
-				// Remove all view engines
-				ViewEngines.Engines.Clear();
-			}
 
-			// Initialize engine context
-			var engine = EngineContext.Initialize(false);
 
-			// Model binders
-			ModelBinders.Binders.DefaultBinder = new SmartModelBinder();
 
-			// Add some functionality on top of the default ModelMetadataProvider
-			ModelMetadataProviders.Current = new SmartMetadataProvider();
 
-			// Register MVC areas
-			AreaRegistration.RegisterAllAreas();
 
-			// Fluent validation
-			InitializeFluentValidator();
-			
-			// Routes
-			RegisterRoutes(RouteTable.Routes, engine, installed);
 
-			// localize MVC resources
-			ClientDataTypeModelValidatorProvider.ResourceClassKey = "MvcLocalization";
-			DefaultModelBinder.ResourceClassKey = "MvcLocalization";
-			ErrorMessageProvider.SetResourceClassKey("MvcLocalization");
 
-			// Register JsEngine
-			RegisterJsEngines();
 
-			// VPPs
-			RegisterVirtualPathProviders();
 
-			if (installed)
-			{
-				// register our themeable razor view engine we use
-				ViewEngines.Engines.Add(new ThemeableRazorViewEngine());
 
-				// Global filters
-				RegisterGlobalFilters(GlobalFilters.Filters, engine);
 
-				// Bundles
-				RegisterBundles(BundleTable.Bundles, engine);
 
-				// "throw-away" filter for task scheduler initialization (the filter removes itself when processed)
-				GlobalFilters.Filters.Add(new InitializeSchedulerFilter(), int.MinValue);
 
-				// register AutoMapper class maps
-				RegisterClassMaps(engine);
-			}
-			else
-			{
-				// app not installed
-
-				// Install filter
-				GlobalFilters.Filters.Add(new HandleInstallFilter(), -1000);
-			}
-		}
-
-		private static void InitializeFluentValidator()
+        private static void InitializeFluentValidator()
 		{
 			FluentValidationModelValidatorProvider.Configure(x =>
 			{
@@ -245,4 +271,25 @@ namespace SmartStore.Web
 			return base.GetVaryByCustomString(context, custom);
 		}
 	}
+
+
+    //public class MyDbContext : DbContext
+    //{
+    //    public DbSet<ProductBundleItemAttributeFilter> ProductBundleItemAttributeFilters { get; set; }
+    //    public DbSet<ProductBundleItem> ProductBundleItems { get; set; }
+    //    public MyDbContext()
+    //    {
+    //    }
+    //}
+
+    public class YourContext : DbContext
+    {
+        public YourContext()
+        {
+            //Database.Log = sql => Debug.Write(sql);
+        }
+    }
+
+
+
 }

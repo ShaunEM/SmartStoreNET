@@ -23,15 +23,35 @@ namespace SmartStore.Web.Infrastructure
 				new { controller = new IsKnownController() },
 				new[] { "SmartStore.Web.Controllers" }
 			);
-			
-			routes.MapRoute(
-				"Default",
-				"{controller}/{action}/{id}",
-				new { controller = "Home", action = "Index", id = UrlParameter.Optional },
-				new { controller = new IsKnownController() },
-				new[] { "SmartStore.Web.Controllers" }
-			);
-		}
+
+
+            // MOD add default route
+            routes.MapRoute(
+                "Default",
+                "{controller}/{action}/{id}",
+                new
+                {
+                    controller = "Home",
+                    action = "Index",
+                    id = UrlParameter.Optional
+                },
+                new
+                {
+                    controller = new IsKnownController()
+                }
+                , new[] { "SmartStore.Web.Controllers" }
+            );
+
+            //routes.MapRoute(
+            //    name: "Default",
+            //    url: "{controller}/{action}/{id}",
+            //    defaults: new {
+            //        controller = "Home",
+            //        action = "Index",
+            //        id = UrlParameter.Optional
+            //    }
+            //);
+        }
 
 		public int Priority
 		{
@@ -59,16 +79,16 @@ namespace SmartStore.Web.Infrastructure
 		
 		public bool Match(HttpContextBase httpContext, Route route, string parameterName, RouteValueDictionary values, RouteDirection routeDirection)
 		{
-			object value;
-			if (values.TryGetValue(parameterName, out value))
-			{
-				var requestedController = Convert.ToString(value);
-				if (s_knownControllers.Contains(requestedController))
-				{
-					return true;
-				}
-			}
-			return false;
+            object value;
+            if (values.TryGetValue(parameterName, out value))
+            {
+                var requestedController = Convert.ToString(value);
+                if (s_knownControllers.Contains(requestedController))
+                {
+                    return true;
+                }
+            }
+            return false;
 		}
 	}
 }

@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Web;
-using System.Data.Entity;
 using SmartStore.Collections;
 using SmartStore.Core;
 using SmartStore.Core.Data;
@@ -444,7 +443,20 @@ namespace SmartStore.Services.Customers
 								&& a.Value == clientIdent
 							select c;
 				}
-				else
+                else if (DataSettings.Current.IsMySqlServer)
+                {
+                    query = from a in _gaRepository.TableUntracked
+                            join c in _customerRepository.Table on a.EntityId equals c.Id into Customers
+                            from c in Customers.DefaultIfEmpty()
+                            where c.LastActivityDateUtc >= dateFrom
+                                && c.Username == null
+                                && c.Email == null
+                                && a.KeyGroup == "Customer"
+                                && a.Key == "ClientIdent"
+                                && a.Value == clientIdent
+                            select c;
+                }
+                else
 				{
 					query = from a in _gaRepository.TableUntracked
 							join c in _customerRepository.Table on a.EntityId equals c.Id into Customers
@@ -571,7 +583,7 @@ namespace SmartStore.Services.Customers
 							select cGroup.FirstOrDefault();
 				query = query.OrderBy(c => c.Id);
 
-				var customers = query.Take(() => maxItemsToDelete).ToList();
+				var customers = query.Take(maxItemsToDelete).ToList();
 
 				int numberOfDeletedCustomers = 0;
 				foreach (var c in customers)

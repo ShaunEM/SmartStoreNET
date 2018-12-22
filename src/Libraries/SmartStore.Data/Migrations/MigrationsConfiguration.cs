@@ -1,12 +1,15 @@
 ﻿namespace SmartStore.Data.Migrations
 {
 	using System;
-	using System.Data.Entity.Migrations;
-	using Setup;
-    using SmartStore.Core.Data;
-    using SmartStore.Core.Domain.Catalog;
-	using SmartStore.Core.Domain.Common;
-	using SmartStore.Utilities;
+    using System.Data.Entity;
+    using System.Data.Entity.Migrations;
+    using System.Data.Entity.Migrations.Model;
+    using System.Data.Entity.Migrations.Sql;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Text;
+    using MySql.Data.Entity;
+    using Setup;
 
 	public sealed class MigrationsConfiguration : DbMigrationsConfiguration<SmartObjectContext>
 	{
@@ -16,17 +19,10 @@
 			AutomaticMigrationDataLossAllowed = true;
 			ContextKey = "SmartStore.Core";
 
-            if (DataSettings.Current.IsSqlServer)
-            {
-                var commandTimeout = CommonHelper.GetAppSetting<int?>("sm:EfMigrationsCommandTimeout");
-                if (commandTimeout.HasValue)
-                {
-                    CommandTimeout = commandTimeout.Value;
-                }
-
-                CommandTimeout = 9999999;
-            }
-		}
+            // MOD:
+            //SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
+            SetSqlGenerator("MySql.Data.MySqlClient", new MySQLMigration());
+        }
 
 		public void SeedDatabase(SmartObjectContext context)
 		{
@@ -43,17 +39,7 @@
 
 		public void MigrateSettings(SmartObjectContext context)
 		{
-			context.MigrateSettings(x => 
-			{
-				x.Add(TypeHelper.NameOf<PerformanceSettings>(y => y.CacheSegmentSize, true), 500);
-				x.Add(TypeHelper.NameOf<PerformanceSettings>(y => y.AlwaysPrefetchTranslations, true), false);
-				x.Add(TypeHelper.NameOf<PerformanceSettings>(y => y.AlwaysPrefetchUrlSlugs, true), false);
 
-				// New CatalogSettings properties
-				x.Add(TypeHelper.NameOf<CatalogSettings>(y => y.ShowSubCategoriesInSubPages, true), false);
-				x.Add(TypeHelper.NameOf<CatalogSettings>(y => y.ShowDescriptionInSubPages, true), false);
-				x.Add(TypeHelper.NameOf<CatalogSettings>(y => y.IncludeFeaturedProductsInSubPages, true), false);
-			});
 		}
 
 		public void MigrateLocaleResources(LocaleResourcesBuilder builder)
@@ -592,7 +578,6 @@
 
             builder.AddOrUpdate("Common.Voting", "Voting", "Abstimmung");
             builder.AddOrUpdate("Common.Answer", "Answer", "Antwort");
-            builder.AddOrUpdate("Common.Size", "Size", "Größe");
 
             builder.AddOrUpdate("Admin.Configuration.Settings.CustomerUser.CustomerFormFields.Description",
                 "Manage form fields that are displayed during registration.",
@@ -613,34 +598,84 @@
             builder.AddOrUpdate("Admin.Common.ProcessingInfo",
                 "{0}: {1} of {2} processed",
                 "{0}: {1} von {2} verarbeitet");
+        }
+    }
 
-			builder.AddOrUpdate("Admin.Configuration.Settings.Catalog.ShowSubCategoriesInSubPages",
-				"Show subcategories also in subpages",
-				"Unterwarengruppen auch in Unterseiten anzeigen",
-				"Subpage: List index greater than 1 or any active filter.",
-				"Unterseite: Listenindex größer 1 oder mind. ein aktiver Filter.");
 
-			builder.AddOrUpdate("Admin.Configuration.Settings.Catalog.ShowDescriptionInSubPages",
-				"Show page description also in subpages",
-				"Seitenbeschreibungen auch in Unterseiten anzeigen",
-				"Subpage: List index greater than 1 or any active filter.",
-				"Unterseite: Listenindex größer 1 oder mind. ein aktiver Filter.");
 
-			builder.AddOrUpdate("Admin.Configuration.Settings.Catalog.IncludeFeaturedProductsInSubPages",
-				"Show featured products also in subpages",
-				"Top-Produkte auch in Unterseiten anzeigen",
-				"Subpage: List index greater than 1 or any active filter.",
-				"Unterseite: Listenindex größer 1 oder mind. ein aktiver Filter.");
 
-			builder.AddOrUpdate("Admin.Common.CopyOf", "Copy of {0}", "Kopie von {0}");
 
-            builder.AddOrUpdate("Admin.Configuration.Languages.DefaultLanguage.Note",
-                "The default language of the shop is <b class=\"font-weight-medium\">{0}</b>. The default is always the first published language.",
-                "Die Standardsprache des Shops ist <b class=\"font-weight-medium\">{0}</b>. Standard ist stets die erste veröffentlichte Sprache.");
 
-            builder.AddOrUpdate("Admin.Configuration.Languages.AvailableLanguages.Note",
-                "Click <b class=\"font-weight-medium\">Download</b> to install a new language including all localized resources. On <a class=\"font-weight-medium\" href=\"https://translate.smartstore.com/\" target=\"_blank\">translate.smartstore.com</a> you will find more details about available resources.",
-                "Klicken Sie auf <b class=\"font-weight-medium\">Download</b>, um eine neue Sprache mit allen lokalisierten Ressourcen zu installieren. Auf <a class=\"font-weight-medium\" href=\"https://translate.smartstore.com/\" target=\"_blank\">translate.smartstore.com</a> finden Sie weitere Details zu verfügbaren Ressourcen.");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public class MySQLMigration : MySqlMigrationSqlGenerator
+    {
+        //public MySQLMigration()
+        //{
+        //    YourContext x = new YourContext();
+        //}
+
+
+
+
+
+        private string TrimSchemaPrefix(string table)
+        {
+            if (table.StartsWith("dbo."))
+                return table.Replace("dbo.", "");
+            return table;
+        }
+
+        protected override MigrationStatement Generate(CreateIndexOperation op)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb = sb.Append("CREATE ");
+
+
+           
+
+            if (op.IsUnique)
+            {
+                sb.Append("UNIQUE ");
+            }
+
+            //index_col_name specification can end with ASC or DESC.
+            // sort order are permitted for future extensions for specifying ascending or descending index value storage
+            //Currently, they are parsed but ignored; index values are always stored in ascending order.
+
+            object sort;
+            op.AnonymousArguments.TryGetValue("Sort", out sort);
+            var sortOrder = sort != null && sort.ToString() == "Ascending" ?
+                            "ASC" : "DESC";
+
+            sb.AppendFormat("index  `{0}` on `{1}` (", op.Name, TrimSchemaPrefix(op.Table));
+            sb.Append(string.Join(",", op.Columns.Select(c => "`" + c + "` " + sortOrder)) + ") ");
+
+            object indexTypeDefinition;
+            op.AnonymousArguments.TryGetValue("Type", out indexTypeDefinition);
+
+            var indexType = indexTypeDefinition != null && string.Compare(indexTypeDefinition.ToString(), "Hash", StringComparison.InvariantCultureIgnoreCase) > 0 ?
+                            "HASH" : "BTREE";
+
+            sb.Append("using " + indexType);
+
+            return new MigrationStatement() {
+                Sql = sb.ToString()
+            };
         }
     }
 }

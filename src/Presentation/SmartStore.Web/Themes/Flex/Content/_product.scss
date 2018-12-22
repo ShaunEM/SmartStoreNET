@@ -339,7 +339,8 @@ $pd-offer-spacing:              $grid-gutter-width / 2;
     }
     &:after {
         display: inline-block;
-        @include fontawesome-font("\f067", regular);
+        font-family: FontAwesome;
+        content: "\f067"; // plus
         padding: 0 0.2rem;
     }
     &:last-child:after {

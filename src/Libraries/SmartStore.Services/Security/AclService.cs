@@ -26,11 +26,7 @@ namespace SmartStore.Services.Security
 
 		private bool? _hasActiveAcl;
 
-        public AclService(
-			ICacheManager cacheManager, 
-			Work<IWorkContext> workContext, 
-			IRepository<AclRecord> aclRecordRepository,
-			ICustomerService customerService)
+        public AclService(ICacheManager cacheManager, Work<IWorkContext> workContext, IRepository<AclRecord> aclRecordRepository,  ICustomerService customerService)
         {
             _cacheManager = cacheManager;
             _workContext = workContext;
@@ -73,7 +69,7 @@ namespace SmartStore.Services.Security
 			Guard.NotNull(entity, nameof(entity));
 
 			int entityId = entity.Id;
-            string entityName = entity.GetEntityName();
+            string entityName = typeof(T).Name;
 
 			return GetAclRecordsFor(entityName, entityId);
         }
@@ -131,7 +127,7 @@ namespace SmartStore.Services.Security
                 throw new ArgumentOutOfRangeException(nameof(customerRoleId));
 
             int entityId = entity.Id;
-            string entityName = entity.GetEntityName();
+            string entityName = typeof(T).Name;
 
             var aclRecord = new AclRecord
             {

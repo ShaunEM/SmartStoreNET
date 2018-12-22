@@ -13,9 +13,9 @@ namespace SmartStore.Data.Migrations
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
-                        PaymentMethodSystemName = c.String(nullable: false, maxLength: 4000),
+                        PaymentMethodSystemName = c.String(nullable: false, maxLength: 400),
                         ExcludedCustomerRoleIds = c.String(maxLength: 500),
-                        ExcludedCountryIds = c.String(maxLength: 2000),
+                        ExcludedCountryIds = c.String(maxLength: 200),
                         ExcludedShippingMethodIds = c.String(maxLength: 500),
                         CountryExclusionContextId = c.Int(nullable: false),
                         MinimumOrderAmount = c.Decimal(precision: 18, scale: 4),

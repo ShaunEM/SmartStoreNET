@@ -143,9 +143,7 @@ a.pretty-link {
 }
 
 .text-body {
-    @if $font-size-base < 1rem {
-        font-size: $lead-font-size;
-    }   
+    font-size: $lead-font-size;
 }
 
 code {

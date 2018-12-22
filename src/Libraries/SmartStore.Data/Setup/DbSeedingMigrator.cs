@@ -25,8 +25,7 @@ namespace SmartStore.Data.Setup
 		/// <summary>
 		/// Initializes a new instance of the DbMigrator class with the default (core db) configuration.
 		/// </summary>
-		public DbSeedingMigrator()
-			: this(new MigrationsConfiguration())
+		public DbSeedingMigrator()	: this(new MigrationsConfiguration())
 		{
 		}
 
@@ -34,10 +33,10 @@ namespace SmartStore.Data.Setup
 		/// Initializes a new instance of the DbMigrator class.
 		/// </summary>
 		/// <param name="configuration">Configuration to be used for the migration process.</param>
-		public DbSeedingMigrator(DbMigrationsConfiguration configuration)
-			: base(configuration)
-		{ 
-		}
+		public DbSeedingMigrator(DbMigrationsConfiguration configuration): base(configuration)
+		{
+           
+        }
 
 		public ILogger Logger
 		{

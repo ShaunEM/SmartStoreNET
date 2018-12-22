@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SmartStore.Collections;
 using SmartStore.Core.Domain.Catalog;
 using SmartStore.Core.Domain.Directory;
@@ -28,7 +27,6 @@ namespace SmartStore.Core.Search
 			DeliveryTimes = new Dictionary<int, DeliveryTime>();
 			Manufacturers = new Dictionary<int, Manufacturer>();
 			Categories = new Dictionary<int, Category>();
-			Translations = new Dictionary<string, LocalizedPropertyCollection>(StringComparer.OrdinalIgnoreCase);
 			CustomProperties = new Dictionary<string, object>();
 		}
 
@@ -81,11 +79,6 @@ namespace SmartStore.Core.Search
 		/// All delivery times
 		/// </summary>
 		public Dictionary<int, DeliveryTime> DeliveryTimes { get; set; }
-
-		/// <summary>
-		/// All translations for global scopes (like Category, Manufacturer etc.)
-		/// </summary>
-		public Dictionary<string, LocalizedPropertyCollection> Translations { get; set; }
 
 		/// <summary>
 		/// Use this dictionary for any custom data required along indexing

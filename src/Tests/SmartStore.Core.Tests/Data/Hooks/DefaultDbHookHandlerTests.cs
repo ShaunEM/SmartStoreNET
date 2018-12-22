@@ -150,7 +150,8 @@ namespace SmartStore.Core.Tests.Data.Hooks
 			{
 				HookedType = typeof(TEntity),
 				ImplType = typeof(THook),
-				Important = typeof(THook).GetAttribute<ImportantAttribute>(false) != null
+				Important = typeof(THook).GetAttribute<ImportantAttribute>(false) != null,
+				IsLoadHook = typeof(IDbLoadHook).IsAssignableFrom(typeof(THook))
 			});
 
 			return hook;

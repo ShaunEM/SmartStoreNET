@@ -37,20 +37,6 @@ namespace SmartStore.Services.Search
 			return this.MemberwiseClone();
 		}
 
-		public bool IsSubPage
-		{
-			get
-			{
-				if (PageIndex > 0)
-				{
-					return true;
-				}
-				
-				var hasActiveFilter = FacetDescriptors.Values.Any(x => x.Values.Any(y => y.IsSelected));
-				return hasActiveFilter;
-			}
-		}
-
 		#region Fluent builder
 
 		public CatalogSearchQuery SortBy(ProductSortingEnum sort)
@@ -206,9 +192,12 @@ namespace SmartStore.Services.Search
 				return this;
 			}
 
-			var fieldName = featuredOnly.HasValue
-                ? featuredOnly.Value ? "featuredcategoryid" : "notfeaturedcategoryid"
-                : "categoryid";
+			string fieldName = null;
+
+			if (featuredOnly.HasValue)
+				fieldName = (featuredOnly.Value ? "featuredcategoryid" : "notfeaturedcategoryid");
+			else
+				fieldName = "categoryid";
 
 			return WithFilter(SearchFilter.Combined(ids.Select(x => SearchFilter.ByField(fieldName, x).ExactMatch().NotAnalyzed()).ToArray()));
 		}
@@ -233,9 +222,12 @@ namespace SmartStore.Services.Search
 				return this;
 			}
 
-			var fieldName = featuredOnly.HasValue
-                ? featuredOnly.Value ? "featuredmanufacturerid" : "notfeaturedmanufacturerid"
-                : "manufacturerid";
+			string fieldName = null;
+
+			if (featuredOnly.HasValue)
+				fieldName = (featuredOnly.Value ? "featuredmanufacturerid" : "notfeaturedmanufacturerid");
+			else
+				fieldName = "manufacturerid";
 
 			return WithFilter(SearchFilter.Combined(ids.Select(x => SearchFilter.ByField(fieldName, x).ExactMatch().NotAnalyzed()).ToArray()));
 		}

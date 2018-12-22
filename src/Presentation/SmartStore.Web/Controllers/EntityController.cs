@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
-using System.Data.Entity;
 using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Catalog;
 using SmartStore.Core.Domain.Media;
@@ -157,10 +156,9 @@ namespace SmartStore.Web.Controllers
 							{
 								searchQuery = searchQuery.WithCategoryIds(null, node.Flatten(true).Select(x => x.Id).ToArray());
 							}
-						}
+						}		
 
-                        var skip = model.PageIndex * model.PageSize;
-                        var query = _catalogSearchService.PrepareQuery(searchQuery);
+						var query = _catalogSearchService.PrepareQuery(searchQuery);
 
 						var products = query
 							.Select(x => new
@@ -173,8 +171,8 @@ namespace SmartStore.Web.Controllers
 								x.MainPictureId
 							})
 							.OrderBy(x => x.Name)
-							.Skip(() => skip)
-							.Take(() => model.PageSize)
+							.Skip(model.PageIndex * model.PageSize)
+							.Take(model.PageSize)
 							.ToList();
 
 						var allPictureIds = products.Select(x => x.MainPictureId.GetValueOrDefault());

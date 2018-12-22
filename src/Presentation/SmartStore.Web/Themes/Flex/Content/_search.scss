@@ -218,10 +218,12 @@ $facet-selection-color:             darken($success, 15%);
     &:after {
 	    display: block;
 	    position: absolute;
-        @include fontawesome-font("\f106", light); // angle-up
+	    font-family: FontAwesome;
 	    font-size: 1.2rem;
 	    line-height: 1;
+	    content: "\f106";
         color: $body-color;
+	    //content: "\f077";
         right: 0;
 	    top: 50%;
 	    margin-top: -7px;

@@ -479,23 +479,23 @@ namespace SmartStore.Services.Tasks
                 idsToDelete.AddRange(ids);
             }
 
+
+            // TOFIX: DeleteHistoryEntries - query rerturns null
             // We have to group by task otherwise we would only keep entries from very frequently executed tasks.
-            if (_commonSettings.Value.MaxNumberOfScheduleHistoryEntries > 0)
-            {
-                var query =
-                    from th in _taskHistoryRepository.TableUntracked
-                    where !th.IsRunning
-                    group th by th.ScheduleTaskId into grp
-                    select grp
-                        .OrderByDescending(x => x.StartedOnUtc)
-                        .ThenByDescending(x => x.Id)
-                        .Skip(_commonSettings.Value.MaxNumberOfScheduleHistoryEntries)
-                        .Select(x => x.Id);
-
-                var ids = query.SelectMany(x => x).ToList();
-
-                idsToDelete.AddRange(ids);
-            }
+            //if (_commonSettings.Value.MaxNumberOfScheduleHistoryEntries > 0)
+            //{
+            //    var query =
+            //        from th in _taskHistoryRepository.TableUntracked
+            //        where !th.IsRunning
+            //        group th by th.ScheduleTaskId into grp
+            //        select grp
+            //            .OrderByDescending(x => x.StartedOnUtc)
+            //            .ThenByDescending(x => x.Id)
+            //            .Skip(_commonSettings.Value.MaxNumberOfScheduleHistoryEntries)
+            //            .Select(x => x.Id);
+            //    var ids = query.SelectMany(x => x)?.ToList();
+            //    idsToDelete.AddRange(ids);
+            //}
 
             try
             {

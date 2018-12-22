@@ -28,7 +28,6 @@ namespace SmartStore.Web.Framework
 			private readonly WebViewPage _page;
 			private readonly string _targetZone;
 			private readonly ZoneInjectMode _injectMode;
-			private readonly bool _isVoid;
 
 			public DocumentZone(HtmlHelper html, string targetZone, ZoneInjectMode injectMode, string key)
 			{
@@ -47,19 +46,7 @@ namespace SmartStore.Web.Framework
 
 				if (key.HasValue())
 				{
-					if (HasUniqueKey(key))
-					{
-						_isVoid = true;
-					}
-					else
-					{
-						UniqueKeys.Add(key);
-					}	
-				}
-
-				if (_page.Request.IsAjaxRequest())
-				{
-					_isVoid = true;
+					UniqueKeys.Add(key);
 				}
 			}
 
@@ -99,7 +86,7 @@ namespace SmartStore.Web.Framework
 					return;
 
 				var writer = ((StringWriter)_page.OutputStack.Pop());
-				var content = _isVoid ? string.Empty : writer.ToString();
+				var content = writer.ToString();
 
 				_viewContext.Writer = _originalViewContextWriter;
 
@@ -127,6 +114,11 @@ namespace SmartStore.Web.Framework
 			ZoneInjectMode injectMode = ZoneInjectMode.Append, 
 			string key = null)
 		{
+			if ((key.HasValue() && DocumentZone.HasUniqueKey(key)) || helper.ViewContext.HttpContext.Request.IsAjaxRequest())
+			{
+				return ActionDisposable.Empty;
+			}
+
 			return new DocumentZone(helper, targetZone, injectMode, key);
 		}
 

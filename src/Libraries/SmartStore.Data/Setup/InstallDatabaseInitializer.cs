@@ -34,8 +34,8 @@ namespace SmartStore.Data.Setup
 			// The installation seeder contains ALL required seed data already.
 			var migrator = new DbMigrator(base.CreateConfiguration());
 
-			// Run all migrations including the initial one
-			migrator.Update();
+            // Run all migrations including the initial one
+            migrator.Update();
 
 			// seed install data
 			this.Seed(context);

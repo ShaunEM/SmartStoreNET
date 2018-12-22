@@ -493,6 +493,7 @@ namespace SmartStore.Services.Catalog
 
 		private void ProcessAssociatedProducts(Product product, Product clone, bool isPublished, bool copyImages)
 		{
+			var copyOf = T("Admin.Common.CopyOf");
 			var searchQuery = new CatalogSearchQuery().HasParentGroupedProduct(product.Id);
 
 			var query = _catalogSearchService.PrepareQuery(searchQuery);
@@ -500,7 +501,7 @@ namespace SmartStore.Services.Catalog
 
 			foreach (var associatedProduct in associatedProducts)
 			{
-				var associatedProductCopy = CopyProduct(associatedProduct, T("Admin.Common.CopyOf", associatedProduct.Name), isPublished, copyImages, false);
+				var associatedProductCopy = CopyProduct(associatedProduct, $"{copyOf} {associatedProduct.Name}", isPublished, copyImages, false);
 				associatedProductCopy.ParentGroupedProductId = clone.Id;
 			}
 		}

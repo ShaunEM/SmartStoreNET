@@ -82,7 +82,6 @@ namespace SmartStore.Web.Framework
                             var language = languageService.GetLanguageById(locale.LanguageId);
 
  							x.Add().Text(language.Name)
-								.LinkHtmlAttributes(new { title = language.Name })
 								.ContentHtmlAttributes(new { @class = "locale-editor-content", data_lang = language.LanguageCulture, data_rtl = language.Rtl.ToString().ToLower() })
 								.Content(localizedTemplate(i))
 								.ImageUrl("~/Content/images/flags/" + language.FlagImageFileName)
@@ -817,7 +816,7 @@ namespace SmartStore.Web.Framework
 			Guard.NotNull(helper, nameof(helper));
 			Guard.NotEmpty(fileExtension, nameof(fileExtension));
 
-			var icon = "far fa-file";
+			var icon = "file-o";
 			var ext = fileExtension;
 
 			if (ext != null && ext.StartsWith("."))
@@ -830,7 +829,7 @@ namespace SmartStore.Web.Framework
 				switch (ext.ToLowerInvariant())
 				{
 					case "pdf":
-						icon = "far fa-file-pdf";
+						icon = "file-pdf-o";
 						break;
 					case "doc":
 					case "docx":
@@ -839,18 +838,18 @@ namespace SmartStore.Web.Framework
 					case "dot":
 					case "dotx":
 					case "dotm":
-						icon = "far fa-file-word";
+						icon = "file-word-o";
 						break;
 					case "xls":
 					case "xlsx":
 					case "xlsm":
 					case "xlsb":
 					case "ods":
-						icon = "far fa-file-excel";
+						icon = "file-excel-o";
 						break;
 					case "csv":
 					case "tab":
-						icon = "fa fa-file-csv";
+						icon = "table";
 						break;
 					case "ppt":
 					case "pptx":
@@ -862,25 +861,25 @@ namespace SmartStore.Web.Framework
 					case "potm":
 					case "pps":
 					case "ppsm":
-						icon = "far fa-file-powerpoint";
+						icon = "file-powerpoint-o";
 						break;
 					case "zip":
 					case "rar":
 					case "7z":
-						icon = "far fa-file-archive";
+						icon = "file-archive-o";
 						break;
 					case "png":
 					case "jpg":
 					case "jpeg":
 					case "bmp":
 					case "psd":
-						icon = "far fa-file-image";
+						icon = "file-image-o";
 						break;
 					case "mp3":
 					case "wav":
 					case "ogg":
 					case "wma":
-						icon = "far fa-file-audio";
+						icon = "file-audio-o";
 						break;
 					case "mp4":
 					case "mkv":
@@ -889,25 +888,25 @@ namespace SmartStore.Web.Framework
 					case "asf":
 					case "mpg":
 					case "mpeg":
-						icon = "far fa-file-video";
+						icon = "file-video-o";
 						break;
 					case "txt":
-						icon = "far fa-file-alt";
+						icon = "file-text-o";
 						break;
 					case "exe":
-						icon = "fa fa-cog";
+						icon = "gear";
 						break;
 					case "xml":
 					case "html":
 					case "htm":
-						icon = "far fa-file-code";
+						icon = "file-code-o";
 						break;
 				}
 			}
 
 			var label = ext.NaIfEmpty().ToUpper();
 
-			var result = "<i class='fa-fw {0}{1}' title='{2}'></i>".FormatInvariant(
+			var result = "<i class='fa fa-fw fa-{0}{1}' title='{2}'></i>".FormatInvariant(
 				icon, 
 				extraCssClasses.HasValue() ? " " + extraCssClasses : "",
 				label);

@@ -13,7 +13,8 @@ namespace SmartStore.Data.Migrations
         public override void Up()
         {
 			AddColumn("dbo.ScheduleTask", "CronExpression", c => c.String(maxLength: 1000, defaultValue: "0 */1 * * *" /* Every hour */));
-			AddColumn("dbo.ScheduleTask", "RowVersion", c => c.Binary(nullable: false, fixedLength: true, timestamp: true, storeType: "rowversion"));
+            //AddColumn("dbo.ScheduleTask", "RowVersion", c => c.Binary(nullable: false, fixedLength: true, timestamp: true, storeType: "rowversion"));
+            AddColumn("dbo.ScheduleTask", "RowVersion", c => c.Binary(nullable: false, fixedLength: true, timestamp: true, storeType: "timestamp"));
             DropColumn("dbo.ScheduleTask", "Seconds");
         }
         

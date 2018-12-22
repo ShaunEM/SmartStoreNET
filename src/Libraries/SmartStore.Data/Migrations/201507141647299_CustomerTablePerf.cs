@@ -8,8 +8,8 @@ namespace SmartStore.Data.Migrations
         public override void Up()
         {
 			// without dropping the indexes we cannot adjust column lengths
-			DropIndex("dbo.Customer", "IX_Customer_Email");
-			DropIndex("dbo.Customer", "IX_Customer_Username");
+			//DropIndex("dbo.Customer", "IX_Customer_Email");
+			//DropIndex("dbo.Customer", "IX_Customer_Username");
 			
 			AlterColumn("dbo.Customer", "Username", c => c.String(maxLength: 500));
             AlterColumn("dbo.Customer", "Email", c => c.String(maxLength: 500));

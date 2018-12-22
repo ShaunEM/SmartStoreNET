@@ -30,8 +30,7 @@ namespace SmartStore.Data
 		/// <summary>
 		/// For tooling support, e.g. EF Migrations
 		/// </summary>
-		public SmartObjectContext()
-			: base()
+		public SmartObjectContext()	: base()
 		{
 		}
 

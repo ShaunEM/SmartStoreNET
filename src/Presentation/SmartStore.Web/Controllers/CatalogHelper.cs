@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using System.Data.Entity;
 using SmartStore.Collections;
 using SmartStore.Core.Caching;
 using SmartStore.Core.Data;
@@ -39,7 +38,6 @@ using SmartStore.Web.Framework.UI;
 using SmartStore.Web.Infrastructure.Cache;
 using SmartStore.Web.Models.Catalog;
 using SmartStore.Web.Models.Media;
-using SmartStore.Core.Domain.Common;
 
 namespace SmartStore.Web.Controllers
 {
@@ -68,7 +66,6 @@ namespace SmartStore.Web.Controllers
 		private readonly CustomerSettings _customerSettings;
 		private readonly CaptchaSettings _captchaSettings;
 		private readonly TaxSettings _taxSettings;
-		private readonly PerformanceSettings _performanceSettings;
 		private readonly IMeasureService _measureService;
         private readonly IQuantityUnitService _quantityUnitService;
 		private readonly MeasureSettings _measureSettings;
@@ -83,8 +80,6 @@ namespace SmartStore.Web.Controllers
 		private readonly HttpRequestBase _httpRequest;
 		private readonly UrlHelper _urlHelper;
 		private readonly ProductUrlHelper _productUrlHelper;
-		private readonly ILocalizedEntityService _localizedEntityService;
-		private readonly IUrlRecordService _urlRecordService;
 
 		public CatalogHelper(
 			ICommonServices services,
@@ -112,7 +107,6 @@ namespace SmartStore.Web.Controllers
             IQuantityUnitService quantityUnitService,
 			MeasureSettings measureSettings,
 			TaxSettings taxSettings,
-			PerformanceSettings performanceSettings,
 			IDeliveryTimeService deliveryTimeService,
 			ISettingService settingService,
 			Lazy<IMenuPublisher> _menuPublisher,
@@ -124,9 +118,7 @@ namespace SmartStore.Web.Controllers
 			ISiteMapService siteMapService,
 			HttpRequestBase httpRequest,
 			UrlHelper urlHelper,
-			ProductUrlHelper productUrlHelper,
-			ILocalizedEntityService localizedEntityService,
-			IUrlRecordService urlRecordService)
+			ProductUrlHelper productUrlHelper)
 		{
 			this._services = services;
 			this._categoryService = categoryService;
@@ -150,7 +142,6 @@ namespace SmartStore.Web.Controllers
             this._quantityUnitService = quantityUnitService;
 			this._measureSettings = measureSettings;
 			this._taxSettings = taxSettings;
-			this._performanceSettings = performanceSettings;
 			this._deliveryTimeService = deliveryTimeService;
 			this._settingService = settingService;
 			this._mediaSettings = mediaSettings;
@@ -166,8 +157,6 @@ namespace SmartStore.Web.Controllers
 			this._httpRequest = httpRequest;
 			this._urlHelper = urlHelper;
 			this._productUrlHelper = productUrlHelper;
-			this._localizedEntityService = localizedEntityService;
-			this._urlRecordService = urlRecordService;
 
 			T = NullLocalizer.Instance;
 		}
@@ -438,7 +427,7 @@ namespace SmartStore.Web.Controllers
 
 			var reviews = query
 				.OrderByDescending(x => x.CreatedOnUtc)
-				.Take(() => take)
+				.Take(take)
 				.ToList();
 
 			foreach (var review in reviews)

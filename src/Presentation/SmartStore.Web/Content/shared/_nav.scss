@@ -223,7 +223,9 @@
             }
 
             &:not(.disabled):after {
-                @include fontawesome-font('\f105', light); // angle-right
+                font-family: FontAwesome;
+                content: "\f105"; // angle-right
+                //color: #ccc;
                 font-size: 1.5rem;
                 line-height: 1;
                 position: absolute;
@@ -279,7 +281,7 @@
 		vertical-align: baseline;
 		font-size: inherit;
 		margin-right: 0.5rem;
-		color: $gray-700;
+		color: $text-muted;
 
 		+ span {
 			// Reset left space

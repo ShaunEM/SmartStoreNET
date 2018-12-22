@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Data.Entity;
 using SmartStore.Core;
 using SmartStore.Core.Data;
 using SmartStore.Core.Domain.Catalog;
@@ -72,38 +71,122 @@ namespace SmartStore.Services.Orders
             int[] paymentStatusIds, int[] shippingStatusIds, DateTime? startTimeUtc, DateTime? endTimeUtc,
             string billingEmail, bool ignoreCancelledOrders = false)
         {
-            var query = _orderRepository.Table;
-            query = query.Where(o => !o.Deleted);
-			if (storeId > 0)
-				query = query.Where(o => o.StoreId == storeId);
-            if (ignoreCancelledOrders)
-            {
-                int cancelledOrderStatusId = (int)OrderStatus.Cancelled;
-                query = query.Where(o => o.OrderStatusId != cancelledOrderStatusId);
-            }
-            if (startTimeUtc.HasValue)
-                query = query.Where(o => startTimeUtc.Value <= o.CreatedOnUtc);
-            if (endTimeUtc.HasValue)
-                query = query.Where(o => endTimeUtc.Value >= o.CreatedOnUtc);
-            if (!String.IsNullOrEmpty(billingEmail))
-                query = query.Where(o => o.BillingAddress != null && !String.IsNullOrEmpty(o.BillingAddress.Email) && o.BillingAddress.Email.Contains(billingEmail));
+            // TOFIX: GetOrderAverageReportLine group by error
+            //if (DataSettings.Current.IsMySqlServer)
+            //{
+            //    var query = _orderRepository.Table;
+            //    query = query.Where(o => !o.Deleted);
+            //    if (storeId > 0)
+            //    {
+            //        query = query.Where(o => o.StoreId == storeId);
+            //    }
+            //    if (ignoreCancelledOrders)
+            //    {
+            //        int cancelledOrderStatusId = (int)OrderStatus.Cancelled;
+            //        query = query.Where(o => o.OrderStatusId != cancelledOrderStatusId);
+            //    }
+            //    if (startTimeUtc.HasValue)
+            //    {
+            //        query = query.Where(o => startTimeUtc.Value <= o.CreatedOnUtc);
+            //    }
+            //    if (endTimeUtc.HasValue)
+            //    {
+            //        query = query.Where(o => endTimeUtc.Value >= o.CreatedOnUtc);
+            //    }
+            //    if (!String.IsNullOrEmpty(billingEmail))
+            //    {
+            //        query = query.Where(o => o.BillingAddress != null && !String.IsNullOrEmpty(o.BillingAddress.Email) && o.BillingAddress.Email.Contains(billingEmail));
+            //    }
+            //    if (orderStatusIds != null && orderStatusIds.Count() > 0)
+            //    {
+            //        query = query.Where(x => orderStatusIds.Contains(x.OrderStatusId));
+            //    }
+            //    if (paymentStatusIds != null && paymentStatusIds.Count() > 0)
+            //    {
+            //        query = query.Where(x => paymentStatusIds.Contains(x.PaymentStatusId));
+            //    }
+            //    if (shippingStatusIds != null && shippingStatusIds.Count() > 0)
+            //    {
+            //        query = query.Where(x => shippingStatusIds.Contains(x.ShippingStatusId));
+            //    }
+            //    var item = (from oq in query
+            //                group oq by 1).Select(x => new OrderAverageReportLine() {
+            //                    SumTax = Sum(x.OrderTax()),
+            //                    CountOrders = x.OrderCount,
+            //                    SumOrders = x.OrderTotalSum
+            //                }).FirstOrDefault();
+            //    item = item ?? new OrderAverageReportLine() { CountOrders = 0, SumOrders = decimal.Zero, SumTax = decimal.Zero };
+            //    return item;
+            //    //                return new OrderAverageReportLine() { CountOrders = 0, SumOrders = decimal.Zero, SumTax = decimal.Zero };
+            //}
+            //else
+            //{
+                var query = _orderRepository.Table;
+                query = query.Where(o => !o.Deleted);
 
-			if (orderStatusIds != null && orderStatusIds.Count() > 0)
-				query = query.Where(x => orderStatusIds.Contains(x.OrderStatusId));
+                if (storeId > 0)
+                {
+                    query = query.Where(o => o.StoreId == storeId);
+                }
 
-			if (paymentStatusIds != null && paymentStatusIds.Count() > 0)
-				query = query.Where(x => paymentStatusIds.Contains(x.PaymentStatusId));
+                if (ignoreCancelledOrders)
+                {
+                    int cancelledOrderStatusId = (int)OrderStatus.Cancelled;
+                    query = query.Where(o => o.OrderStatusId != cancelledOrderStatusId);
+                }
 
-			if (shippingStatusIds != null && shippingStatusIds.Count() > 0)
-				query = query.Where(x => shippingStatusIds.Contains(x.ShippingStatusId));
+                if (startTimeUtc.HasValue)
+                {
+                    query = query.Where(o => startTimeUtc.Value <= o.CreatedOnUtc);
+                }
 
-			var item = (from oq in query
-						group oq by 1 into result
-						select new { OrderCount = result.Count(), OrderTaxSum = result.Sum(o => o.OrderTax), OrderTotalSum = result.Sum(o => o.OrderTotal) }
-					   ).Select(r => new OrderAverageReportLine(){ SumTax = r.OrderTaxSum, CountOrders=r.OrderCount, SumOrders = r.OrderTotalSum}).FirstOrDefault();
+                if (endTimeUtc.HasValue)
+                {
+                    query = query.Where(o => endTimeUtc.Value >= o.CreatedOnUtc);
+                }
 
-			item = item ?? new OrderAverageReportLine() { CountOrders = 0, SumOrders = decimal.Zero, SumTax = decimal.Zero };
-            return item;
+                if (!String.IsNullOrEmpty(billingEmail))
+                {
+                    query = query.Where(o => o.BillingAddress != null && !String.IsNullOrEmpty(o.BillingAddress.Email) && o.BillingAddress.Email.Contains(billingEmail));
+                }
+
+                if (orderStatusIds != null && orderStatusIds.Count() > 0)
+                {
+                    query = query.Where(x => orderStatusIds.Contains(x.OrderStatusId));
+                }
+
+                if (paymentStatusIds != null && paymentStatusIds.Count() > 0)
+                {
+                    query = query.Where(x => paymentStatusIds.Contains(x.PaymentStatusId));
+                }
+
+                if (shippingStatusIds != null && shippingStatusIds.Count() > 0)
+                {
+                    query = query.Where(x => shippingStatusIds.Contains(x.ShippingStatusId));
+                }
+
+                if (query.Count() > 0)
+                {
+                        var item = (from oq in query
+                        group oq by 1 into result
+                        select new
+                        {
+                            OrderCount = result.Count(),
+                            OrderTaxSum = result.Sum(o => o.OrderTax),
+                            OrderTotalSum = result.Sum(o => o.OrderTotal)
+                        }
+                    ).Select(r => new OrderAverageReportLine() { SumTax = r.OrderTaxSum, CountOrders = r.OrderCount, SumOrders = r.OrderTotalSum }).FirstOrDefault();
+
+                    return item = item ?? new OrderAverageReportLine() { CountOrders = 0, SumOrders = decimal.Zero, SumTax = decimal.Zero };
+                }
+            
+                return new OrderAverageReportLine() {
+                    CountOrders = 0,
+                    SumOrders = decimal.Zero,
+                    SumTax = decimal.Zero
+                };
+            //}
+
         }
 
         /// <summary>
@@ -249,7 +332,7 @@ namespace SmartStore.Services.Orders
             }
 
             if (recordsToReturn != 0 && recordsToReturn != int.MaxValue)
-                query2 = query2.Take(() => recordsToReturn);
+                query2 = query2.Take(recordsToReturn);
 
             var result = query2.ToList().Select(x =>
             {
@@ -309,7 +392,7 @@ namespace SmartStore.Services.Orders
             query3 = query3.OrderByDescending(x => x.ProductsPurchased);
 
 			if (recordsToReturn > 0)
-				query3 = query3.Take(() => recordsToReturn);
+				query3 = query3.Take(recordsToReturn);
 
 			var report = query3.ToList();
 

@@ -9,9 +9,11 @@ namespace SmartStore.Shipping.Data.Migrations
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationsEnabled = true;
             MigrationsDirectory = @"Data\Migrations";
 			ContextKey = "SmartStore.ShippingByTotal";
+
+            //SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
         }
 
         protected override void Seed(ByTotalObjectContext context)

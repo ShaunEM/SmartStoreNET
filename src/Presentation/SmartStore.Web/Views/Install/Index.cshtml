@@ -134,10 +134,11 @@
 								<div class="form-group row">
 									<label class="col-md-3 col-form-label" for="DataProvider">@ILS.GetResource("Database")</label>
 									<div class="col-md-9">
-										<select name="DataProvider" id="DataProvider" class="form-control">
-											<option value="sqlce">@ILS.GetResource("SqlCompact")</option>
-											<option value="sqlserver">@ILS.GetResource("SqlStandard") @ILS.GetResource("Recommended")</option>
-										</select>
+                                        <select name="DataProvider" id="DataProvider" class="form-control">
+                                            <option value="sqlce">@ILS.GetResource("SqlCompact")</option>
+                                            <option value="sqlserver">@ILS.GetResource("SqlStandard") @ILS.GetResource("Recommended")</option>
+                                            <option value="mysql">@ILS.GetResource("MySQL")</option>
+                                        </select>
 										@Html.ValidationMessageFor(x => x.DataProvider)
 									</div>
 								</div>
@@ -329,11 +330,26 @@
 		function toggleProvider(e) {
 			var selectedProvider = $(this).val();
 			if (selectedProvider == 'sqlce') {
-				hide('#sqlConnectionInfo');
+                hide('#sqlConnectionInfo');
+                $('#SqlConnectionInfo').removeAttr("disabled");
 			}
 			else if (selectedProvider == 'sqlserver') {
-				show('#sqlConnectionInfo');
-			}
+                show('#sqlConnectionInfo');
+                $('#SqlConnectionInfo').removeAttr("disabled");
+            }
+            else if (selectedProvider == 'mysql') {
+                show('#sqlConnectionInfo');
+                show('#sqlDatabaseInfo');
+
+                $("#SqlConnectionInfo option[value='sqlconnectioninfo_raw']").attr("selected", "selected");
+                $("#SqlConnectionInfo").attr("disabled", "disabled");
+                hide('#sqlDatabaseInfo', '#sqlDatabaseConnectionString');
+
+                
+
+
+
+            }
 		}
 
 		function toggleSqlConnectionInfo(e) {

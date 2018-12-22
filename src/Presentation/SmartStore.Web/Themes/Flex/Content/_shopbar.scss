@@ -212,6 +212,7 @@
 
 .menubar-section {
     background: $menubar-bg;
+
     .abbreviation { text-transform: uppercase; }
 }
 
@@ -232,10 +233,6 @@
     padding: 1em 0.8em;
     text-decoration: none !important;
     text-transform: uppercase;
-
-    > .menubar-icon {
-        font-size: $font-size-base;
-    }
 }
 
 .menubar-group--special {

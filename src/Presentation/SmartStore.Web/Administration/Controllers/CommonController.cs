@@ -337,6 +337,7 @@ namespace SmartStore.Admin.Controllers
 			// DB size & used RAM
 			try
 			{
+                // TODO: change to mysql
 				var mbSize = _services.DbContext.SqlQuery<decimal>("Select Sum(size)/128.0 From sysfiles").FirstOrDefault();
 				model.DatabaseSize = Convert.ToInt64(mbSize * 1024 *1024);
 
@@ -497,6 +498,8 @@ namespace SmartStore.Admin.Controllers
 			{
 				var msg = T("Admin.System.Warnings.TaskScheduler.Fail", _taskScheduler.BaseUrl, exception.Message);
 
+				var xxx = T("Admin.System.Warnings.TaskScheduler.Fail");
+
 				model.Add(new SystemWarningModel
 				{
 					Level = SystemWarningLevel.Fail,
@@ -511,7 +514,7 @@ namespace SmartStore.Admin.Controllers
 			string sitemapUrl = null;
 			try
 			{
-				sitemapUrl = WebHelper.GetAbsoluteUrl(Url.RouteUrl("XmlSitemap"), this.Request);
+				sitemapUrl = WebHelper.GetAbsoluteUrl(Url.RouteUrl("SitemapSEO"), this.Request);
 				var request = WebHelper.CreateHttpRequestForSafeLocalCall(new Uri(sitemapUrl));
 				request.Method = "HEAD";
 				request.Timeout = 15000;

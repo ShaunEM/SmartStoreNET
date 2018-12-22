@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Hosting;
+using MySql.Data.MySqlClient;
 using SmartStore.Utilities;
 using SmartStore.Utilities.Threading;
 
@@ -145,8 +146,11 @@ namespace SmartStore.Core.Data
 				if (this.DataProvider.HasValue() && this.DataProvider.IsCaseInsensitiveEqual("sqlserver"))
 					return "System.Data.SqlClient";
 
-				// SqlCe should always be the default provider
-				return "System.Data.SqlServerCe.4.0";
+                if (this.DataProvider.HasValue() && this.DataProvider.IsCaseInsensitiveEqual("mysql"))
+                    return "MySQL.Data.MySqlClient";
+
+                // SqlCe should always be the default provider
+                return "System.Data.SqlServerCe.4.0";
 			}
 		}
 
@@ -157,8 +161,10 @@ namespace SmartStore.Core.Data
 				if (this.DataProvider.HasValue() && this.DataProvider.IsCaseInsensitiveEqual("sqlserver"))
 					return "SQL Server";
 
-				// SqlCe should always be the default provider
-				return "SQL Server Compact (SQL CE)";
+                if (this.DataProvider.HasValue() && this.DataProvider.IsCaseInsensitiveEqual("mysql"))
+                    return "MySQL Server";
+                // SqlCe should always be the default provider
+                return "SQL Server Compact (SQL CE)";
 			}
 		}
 
@@ -170,6 +176,13 @@ namespace SmartStore.Core.Data
 			}
 		}
 
+        public bool IsMySqlServer
+        {
+            get
+            {
+                return this.DataProvider.HasValue() && this.DataProvider.IsCaseInsensitiveEqual("mysql");
+            }
+        }
         public string DataConnectionString 
 		{ 
 			get; 
@@ -220,9 +233,18 @@ namespace SmartStore.Core.Data
 						if (settings.ContainsKey("DataProvider"))
 						{
 							this.DataProvider = settings["DataProvider"];
-							this.DataConnectionType = this.IsSqlServer 
-								? typeof(SqlConnection).AssemblyQualifiedName 
-								: typeof(SqlCeConnection).AssemblyQualifiedName;
+                            if(this.IsSqlServer)
+                            {
+                                this.DataConnectionType = typeof(SqlConnection).AssemblyQualifiedName;
+                            }
+                            else if(this.IsMySqlServer)
+                            {
+                                this.DataConnectionType = typeof(MySqlConnection).AssemblyQualifiedName;
+                            }
+                            else
+                            {
+                                this.DataConnectionType = typeof(SqlCeConnection).AssemblyQualifiedName;
+                            }
 						}
 						if (settings.ContainsKey("DataConnectionString"))
 						{
@@ -283,6 +305,7 @@ namespace SmartStore.Core.Data
 		protected virtual string ResolveTenant()
 		{
 			var tenantsBaseDir = CommonHelper.MapPath("~/App_Data/Tenants");
+
 			var curTenantFile = Path.Combine(tenantsBaseDir, "current.txt");
 
 			string curTenant = null;

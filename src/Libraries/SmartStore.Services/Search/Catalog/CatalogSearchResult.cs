@@ -9,7 +9,8 @@ namespace SmartStore.Services.Search
 {
     public partial class CatalogSearchResult
 	{
-        private readonly Func<IList<Product>> _hitsFactory;
+		private readonly int _totalHitsCount;
+		private readonly Func<IList<Product>> _hitsFactory;
 		private IPagedList<Product> _hits;
 
 		public CatalogSearchResult(
@@ -28,7 +29,7 @@ namespace SmartStore.Services.Search
 			Facets = facets ?? new Dictionary<string, FacetGroup>();
 
 			_hitsFactory = hitsFactory ?? (() => new List<Product>());
-			TotalHitsCount = totalHitsCount;
+			_totalHitsCount = totalHitsCount;
 		}
 
 		/// <summary>
@@ -49,23 +50,26 @@ namespace SmartStore.Services.Search
 			{
 				if (_hits == null)
 				{
-					var products = TotalHitsCount == 0 
+					var products = _totalHitsCount == 0 
 						? new List<Product>() 
 						: _hitsFactory.Invoke();
 
-					_hits = new PagedList<Product>(products, Query.PageIndex, Query.Take, TotalHitsCount);
+					_hits = new PagedList<Product>(products, Query.PageIndex, Query.Take, _totalHitsCount);
 				}
 
 				return _hits;
 			}
 		}
 
-        public int TotalHitsCount { get; }
+		public int TotalHitsCount
+		{
+			get { return _totalHitsCount; }
+		}
 
-        /// <summary>
-        /// The original catalog search query
-        /// </summary>
-        public CatalogSearchQuery Query
+		/// <summary>
+		/// The original catalog search query
+		/// </summary>
+		public CatalogSearchQuery Query
 		{
 			get;
 			private set;

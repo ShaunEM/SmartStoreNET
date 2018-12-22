@@ -250,17 +250,17 @@ namespace SmartStore.Services.DataExchange.Export
 			switch (type)
 			{
 				case ExportDeploymentType.FileSystem:
-					return "far fa-folder-open";
+					return "fa-folder-open-o";
 				case ExportDeploymentType.Email:
-					return "far fa-envelope";
+					return "fa-envelope-o";
 				case ExportDeploymentType.Http:
-					return "fa fa-globe";
+					return "fa-globe";
 				case ExportDeploymentType.Ftp:
-					return "far fa-copy";
+					return "fa-files-o";
 				case ExportDeploymentType.PublicFolder:
-					return "fa fa-unlock";
+					return "fa-unlock";
 				default:
-					return "fa fa-question";
+					return "fa-question";
 			}
 		}
 	}

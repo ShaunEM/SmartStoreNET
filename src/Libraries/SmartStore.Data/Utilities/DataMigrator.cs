@@ -158,46 +158,54 @@ namespace SmartStore.Data.Utilities
 
 			// 1st pass
 			int pageIndex = -1;
-			while (true)
-			{
-				var products = PagedList.Create(query, ++pageIndex, 1000);
-				var map = GetPoductPictureMap(ctx, products.Select(x => x.Id).ToArray());
+            while (true)
+            {
+                var products = PagedList.Create(query, ++pageIndex, 1000);
+                IDictionary<int, int> map = GetPoductPictureMap(ctx, products.Select(x => x.Id).ToArray());
 
-				foreach (var p in products)
-				{
-					int? fixedPictureId = null;
-					if (map.ContainsKey(p.Id))
-					{
-						// Product has still a pic.
-						fixedPictureId = map[p.Id];
-					}
+                foreach (var p in products)
+                {
+                    int? fixedPictureId = null;
+                    if (map.ContainsKey(p.Id))
+                    {
+                        // Product has still a pic.
+                        fixedPictureId = map[p.Id];
+                    }
 
-					// Update only if fixed PictureId differs from current
-					if (fixedPictureId != p.MainPictureId)
-					{
-						toUpate.Add(p.Id, fixedPictureId);
-					}
-				}
+                    // Update only if fixed PictureId differs from current
+                    if (fixedPictureId != p.MainPictureId)
+                    {
+                        toUpate.Add(p.Id, fixedPictureId);
+                    }
+                }
 
-				if (!products.HasNextPage)
-					break;
-			}
+                if (!products.HasNextPage)
+                    break;
+            }
 
-			// 2nd pass
-			foreach (var chunk in toUpate.Slice(1000))
-			{
-				using (var tx = ctx.Database.BeginTransaction())
-				{
-					foreach (var kvp in chunk)
-					{
-						context.ExecuteSqlCommand("Update [Product] Set [MainPictureId] = {0} WHERE [Id] = {1}", false, null, kvp.Value, kvp.Key);
-					}
+                // 2nd pass
+                foreach (var chunk in toUpate.Slice(1000))
+                {
+                    using (var tx = ctx.Database.BeginTransaction())
+                    {
+                        foreach (var kvp in chunk)
+                        {
 
-					context.SaveChanges();
-					tx.Commit();
-				}
-			}
+                            if (DataSettings.Current.IsMySqlServer)
+                            {
+                                context.ExecuteSqlCommand("Update Product Set MainPictureId = {0} WHERE Product.Id = {1}", false, null, kvp.Value, kvp.Key);
+                            }
+                            else
+                            {
+                                context.ExecuteSqlCommand("Update [Product] Set [MainPictureId] = {0} WHERE [Id] = {1}", false, null, kvp.Value, kvp.Key);
+                            }
+                        }
 
+                        context.SaveChanges();
+                        tx.Commit();
+                    }
+                }
+            
 			return toUpate.Count;
 		}
 

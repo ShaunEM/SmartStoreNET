@@ -131,7 +131,7 @@ namespace SmartStore.Services.Seo
 			Guard.NotNull(entity, nameof(entity));
 
 			return GetSeName(
-				entity.GetEntityName(),
+				typeof(T).Name,
 				entity.Id,
 				EngineContext.Current.Resolve<IWorkContext>().WorkingLanguage.Id,
 				EngineContext.Current.Resolve<IUrlRecordService>(),
@@ -156,7 +156,7 @@ namespace SmartStore.Services.Seo
 			Guard.NotNull(entity, nameof(entity));
 
 			return GetSeName(
-				entity.GetEntityName(),
+				typeof(T).Name,
 				entity.Id,
 				languageId, 
 				EngineContext.Current.Resolve<IUrlRecordService>(), 
@@ -185,7 +185,7 @@ namespace SmartStore.Services.Seo
 			Guard.NotNull(entity, nameof(entity));
 
 			return GetSeName(
-				entity.GetEntityName(),
+				typeof(T).Name,
 				entity.Id,
 				languageId,
 				urlRecordService,
@@ -298,7 +298,7 @@ namespace SmartStore.Services.Seo
             }
             
 			// ensure this sename is not reserved yet
-			string entityName = entity.GetEntityName();
+			string entityName = typeof(T).Name;
 			int i = 2;
 			var tempSeName = seName;
 

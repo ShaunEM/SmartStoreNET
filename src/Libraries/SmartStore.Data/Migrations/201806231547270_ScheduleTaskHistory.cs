@@ -43,7 +43,8 @@ namespace SmartStore.Data.Migrations
 
         public override void Down()
         {
-            AddColumn("dbo.ScheduleTask", "RowVersion", c => c.Binary(nullable: false, fixedLength: true, timestamp: true, storeType: "rowversion"));
+            //AddColumn("dbo.ScheduleTask", "RowVersion", c => c.Binary(nullable: false, fixedLength: true, timestamp: true, storeType: "rowversion"));
+            AddColumn("dbo.ScheduleTask", "RowVersion", c => c.Binary(nullable: false, fixedLength: true, timestamp: true, storeType: "timestamp"));
             AddColumn("dbo.ScheduleTask", "ProgressMessage", c => c.String(maxLength: 1000));
             AddColumn("dbo.ScheduleTask", "ProgressPercent", c => c.Int());
             AddColumn("dbo.ScheduleTask", "LastError", c => c.String(maxLength: 1000));

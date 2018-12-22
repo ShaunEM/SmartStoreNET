@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity.Core.Objects;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -21,27 +20,18 @@ namespace SmartStore.Core
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-		[SuppressMessage("ReSharper", "PossibleNullReferenceException")]
-		public virtual string GetEntityName()
-		{
-			return GetUnproxiedType().Name;
-		}
-
+	    [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
 	    public Type GetUnproxiedType()
         {
-			#region Old
-			//var t = GetType();
-			//if (t.AssemblyQualifiedName.StartsWith("System.Data.Entity."))
-			//{
-			//	// it's a proxied type
-			//	t = t.BaseType;
-			//}
+			var t = GetType();
+			if (t.AssemblyQualifiedName.StartsWith("System.Data.Entity."))
+			{
+				// it's a proxied type
+				t = t.BaseType;
+			}
 
-			//return t;
-			#endregion
-
-			return ObjectContext.GetObjectType(GetType());
-		}
+			return t;
+        }
 
 		/// <summary>
 		/// Transient objects are not associated with an item already in storage. For instance,

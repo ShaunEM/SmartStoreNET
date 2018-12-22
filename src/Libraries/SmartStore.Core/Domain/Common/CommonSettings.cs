@@ -6,7 +6,7 @@ namespace SmartStore.Core.Domain.Common
     {
 		public CommonSettings()
 		{
-			UseStoredProceduresIfSupported = true;
+			UseStoredProceduresIfSupported = true;   
 			AutoUpdateEnabled = true;
 			EntityPickerPageSize = 48;
             MaxScheduleHistoryAgeInDays = 30;

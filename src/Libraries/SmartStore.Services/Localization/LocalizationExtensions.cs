@@ -29,7 +29,7 @@ namespace SmartStore.Services.Localization
         {
 			return GetLocalizedEx(
 				entity,
-				entity.GetEntityName(),
+				typeof(T).Name,
 				LocaleKeyFromExpression(keySelector.Body),
 				x => keySelector.Compile().Invoke(x),
 				EngineContext.Current.Resolve<IWorkContext>().WorkingLanguage,
@@ -57,7 +57,7 @@ namespace SmartStore.Services.Localization
         {
 			return GetLocalizedEx<T, string>(
 				entity,
-				entity.GetEntityName(),
+				typeof(T).Name,
 				LocaleKeyFromExpression(keySelector.Body),
 				x => keySelector.Compile().Invoke(x),
 				EngineContext.Current.Resolve<ILanguageService>().GetLanguageById(languageId),
@@ -88,7 +88,7 @@ namespace SmartStore.Services.Localization
 		{
 			return GetLocalizedEx<T, TProp>(
 				entity,
-				entity.GetEntityName(),
+				typeof(T).Name,
 				localeKey,
 				x => fallback,
 				language,
@@ -118,7 +118,7 @@ namespace SmartStore.Services.Localization
 		{
 			return GetLocalizedEx<T, string>(
 				entity,
-				entity.GetEntityName(),
+				typeof(T).Name,
 				LocaleKeyFromExpression(keySelector.Body),
 				x => keySelector.Compile().Invoke(x),
 				language,
@@ -148,8 +148,8 @@ namespace SmartStore.Services.Localization
 			where T : BaseEntity, ILocalizedEntity
 		{
 			return GetLocalizedEx(
-				entity,
-				entity.GetEntityName(),
+				entity, 
+				typeof(T).Name,
 				LocaleKeyFromExpression(keySelector.Body),
 				x => keySelector.Compile().Invoke(x),
 				EngineContext.Current.Resolve<ILanguageService>().GetLanguageById(languageId), 
@@ -180,7 +180,7 @@ namespace SmartStore.Services.Localization
 		{
 			return GetLocalizedEx(
 				entity,
-				entity.GetEntityName(),
+				typeof(T).Name,
 				LocaleKeyFromExpression(keySelector.Body),
 				x => keySelector.Compile().Invoke(x),
 				language,

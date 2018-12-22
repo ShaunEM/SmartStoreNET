@@ -251,7 +251,7 @@
 
 						var cnt = el.closest('.fileupload-container');
 						cnt.find('.fileupload-thumb').css('background-image', 'url("' + data.result.imageUrl + '")');
-                        cnt.find('.hidden').val(data.result.pictureId).trigger('change');
+						cnt.find('.hidden').val(data.result.pictureId);
 
 						elCancel.addClass("hide");
 						elFile.removeClass("hide");
@@ -281,7 +281,7 @@
 
 				var cnt = el.closest('.fileupload-container');
 				cnt.find('.fileupload-thumb').css('background-image', 'url("' + el.data('fallback-url') + '")');
-				cnt.find('.hidden').val(0).trigger('change');
+				cnt.find('.hidden').val(0);
 				$(this).addClass("hide");
 				if (options.onFileRemove) options.onFileRemove.apply(this, [e, el]);
 			});

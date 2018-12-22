@@ -139,10 +139,6 @@ namespace SmartStore.Web.Controllers
 			}
 
             var model = category.ToModel();
-			if (query.IsSubPage && !_catalogSettings.ShowDescriptionInSubPages)
-			{
-				model.Description.ChangeValue(string.Empty);
-			}
 
 			_services.DisplayControl.Announce(category);
 
@@ -152,73 +148,49 @@ namespace SmartStore.Web.Controllers
 				_helper.GetCategoryBreadCrumb(category.Id, 0).Select(x => x.Value).Each(x => _breadcrumb.Track(x));
 			}
 
-			// Products
-			int[] catIds = new int[] { categoryId };
-			if (_catalogSettings.ShowProductsFromSubcategories)
-			{
-				// Include subcategories
-				catIds = catIds.Concat(_helper.GetChildCategoryIds(categoryId)).ToArray();
-			}
-
-			query.WithCategoryIds(_catalogSettings.IncludeFeaturedProductsInNormalLists ? (bool?)null : false, catIds);
-
-			var searchResult = _catalogSearchService.Search(query);
-			model.SearchResult = searchResult;
-
-			var mappingSettings = _helper.GetBestFitProductSummaryMappingSettings(query.GetViewMode());
-			model.Products = _helper.MapProductSummaryModel(searchResult.Hits, mappingSettings);
-
 			model.SubCategoryDisplayType = _catalogSettings.SubCategoryDisplayType;
 
 			var customerRolesIds = _services.WorkContext.CurrentCustomer.CustomerRoles.Where(x => x.Active).Select(x => x.Id).ToList();
+			var subCategories = _categoryService.GetAllCategoriesByParentCategoryId(categoryId);
 			int pictureSize = _mediaSettings.CategoryThumbPictureSize;
+			var allPictureInfos = _pictureService.GetPictureInfos(subCategories.Select(x => x.PictureId.GetValueOrDefault()));
 			var fallbackType = _catalogSettings.HideCategoryDefaultPictures ? FallbackPictureType.NoFallback : FallbackPictureType.Entity;
 
-			var hideSubCategories = _catalogSettings.SubCategoryDisplayType == SubCategoryDisplayType.Hide 
-				|| (_catalogSettings.SubCategoryDisplayType == SubCategoryDisplayType.AboveProductList && query.IsSubPage && !_catalogSettings.ShowSubCategoriesInSubPages);
-			var hideFeaturedProducts = _catalogSettings.IgnoreFeaturedProducts || (query.IsSubPage && !_catalogSettings.IncludeFeaturedProductsInSubPages);
+			// subcategories
+			model.SubCategories = subCategories
+				.Select(x =>
+                {
+                    var subCatName = x.GetLocalized(y => y.Name);
+                    var subCatModel = new CategoryModel.SubCategoryModel
+                    {
+                        Id = x.Id,
+                        Name = subCatName,
+                        SeName = x.GetSeName(),
+                    };
 
-			// Subcategories
-			if (!hideSubCategories)
-			{
-				var subCategories = _categoryService.GetAllCategoriesByParentCategoryId(categoryId);
-				var allPictureInfos = _pictureService.GetPictureInfos(subCategories.Select(x => x.PictureId.GetValueOrDefault()));
-
-				model.SubCategories = subCategories
-					.Select(x =>
-					{
-						var subCatName = x.GetLocalized(y => y.Name);
-						var subCatModel = new CategoryModel.SubCategoryModel
-						{
-							Id = x.Id,
-							Name = subCatName,
-							SeName = x.GetSeName(),
-						};
-
-						_services.DisplayControl.Announce(x);
+					_services.DisplayControl.Announce(x);
 
 					// prepare picture model
 					var pictureInfo = allPictureInfos.Get(x.PictureId.GetValueOrDefault());
 
-						subCatModel.PictureModel = new PictureModel
-						{
-							PictureId = pictureInfo?.Id ?? 0,
-							Size = pictureSize,
-							ImageUrl = _pictureService.GetUrl(pictureInfo, pictureSize, fallbackType),
-							FullSizeImageUrl = _pictureService.GetUrl(pictureInfo, 0, FallbackPictureType.NoFallback),
-							FullSizeImageWidth = pictureInfo?.Width,
-							FullSizeImageHeight = pictureInfo?.Height,
-							Title = string.Format(T("Media.Category.ImageLinkTitleFormat"), subCatName),
-							AlternateText = string.Format(T("Media.Category.ImageAlternateTextFormat"), subCatName)
-						};
+					subCatModel.PictureModel = new PictureModel
+					{
+						PictureId = pictureInfo?.Id ?? 0,
+						Size = pictureSize,
+						ImageUrl = _pictureService.GetUrl(pictureInfo, pictureSize, fallbackType),
+						FullSizeImageUrl = _pictureService.GetUrl(pictureInfo, 0, FallbackPictureType.NoFallback),
+						FullSizeImageWidth = pictureInfo?.Width,
+						FullSizeImageHeight = pictureInfo?.Height,
+						Title = string.Format(T("Media.Category.ImageLinkTitleFormat"), subCatName),
+						AlternateText = string.Format(T("Media.Category.ImageAlternateTextFormat"), subCatName)
+					};
 
-						return subCatModel;
-					})
-					.ToList();
-			}
+                    return subCatModel;
+                })
+                .ToList();
 
 			// Featured Products
-			if (!hideFeaturedProducts)
+			if (!_catalogSettings.IgnoreFeaturedProducts)
 			{
 				CatalogSearchResult featuredProductsResult = null;
 
@@ -252,6 +224,21 @@ namespace SmartStore.Web.Controllers
 				}
 			}
 
+			// Products
+			int[] catIds = new int[] { categoryId };
+			if (_catalogSettings.ShowProductsFromSubcategories)
+			{
+				// Include subcategories
+				catIds = catIds.Concat(_helper.GetChildCategoryIds(categoryId)).ToArray();
+			}
+
+			query.WithCategoryIds(_catalogSettings.IncludeFeaturedProductsInNormalLists ? (bool?)null : false, catIds);
+
+			var searchResult = _catalogSearchService.Search(query);
+			model.SearchResult = searchResult;
+
+			var mappingSettings = _helper.GetBestFitProductSummaryMappingSettings(query.GetViewMode());
+			model.Products = _helper.MapProductSummaryModel(searchResult.Hits, mappingSettings);
 
 			// Prepare paging/sorting/mode stuff
 			_helper.MapListActions(model.Products, category, _catalogSettings.DefaultPageSizeOptions);
@@ -358,19 +345,14 @@ namespace SmartStore.Web.Controllers
 			}
 
             var model = manufacturer.ToModel();
-			if (query.IsSubPage && !_catalogSettings.ShowDescriptionInSubPages)
-			{
-				model.Description.ChangeValue(string.Empty);
-			}
 
-			// prepare picture model
-			model.PictureModel = _helper.PrepareManufacturerPictureModel(manufacturer, model.Name);
+            // prepare picture model
+            model.PictureModel = _helper.PrepareManufacturerPictureModel(manufacturer, model.Name);
 
 			var customerRolesIds = _services.WorkContext.CurrentCustomer.CustomerRoles.Where(x => x.Active).Select(x => x.Id).ToList();
 
 			// Featured products
-			var hideFeaturedProducts = _catalogSettings.IgnoreFeaturedProducts || (query.IsSubPage && !_catalogSettings.IncludeFeaturedProductsInSubPages);
-			if (!hideFeaturedProducts)
+			if (!_catalogSettings.IgnoreFeaturedProducts)
 			{
 				CatalogSearchResult featuredProductsResult = null;
 

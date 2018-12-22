@@ -3965,7 +3965,7 @@ namespace SmartStore.Data.Setup
 
 		public IList<ISettings> Settings()
 		{
-			var entities = new List<ISettings>
+            List<ISettings> entities = new List<ISettings>
 			{
 				new PdfSettings
 				{

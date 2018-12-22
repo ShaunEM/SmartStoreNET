@@ -99,45 +99,43 @@ namespace SmartStore.Services.Catalog
 		/// <returns>Dictionary of "product tag ID : product count"</returns>
 		private Dictionary<int, int> GetProductCount(int storeId)
 		{
-			string key = string.Format(PRODUCTTAG_COUNT_KEY, storeId);
-			return _cacheManager.Get(key, () =>
-			{
-				IEnumerable<ProductTagWithCount> tagCount = null;
+            string key = string.Format(PRODUCTTAG_COUNT_KEY, storeId);
+            return _cacheManager.Get(key, () =>
+            {
+                IEnumerable<ProductTagWithCount> tagCount = null;
 
-				if (_commonSettings.UseStoredProceduresIfSupported && _dataProvider.StoredProceduresSupported)
-				{
-					//stored procedures are enabled and supported by the database. It's much faster than the LINQ implementation below 
+                if (_commonSettings.UseStoredProceduresIfSupported && _dataProvider.StoredProceduresSupported)
+                {
+                    //stored procedures are enabled and supported by the database. It's much faster than the LINQ implementation below 
+                    var pStoreId = _dataProvider.GetParameter();
+                    pStoreId.ParameterName = "StoreId";
+                    pStoreId.Value = storeId;
+                    pStoreId.DbType = DbType.Int32;
 
-					var pStoreId = _dataProvider.GetParameter();
-					pStoreId.ParameterName = "StoreId";
-					pStoreId.Value = storeId;
-					pStoreId.DbType = DbType.Int32;
+                    tagCount = _dbContext.SqlQuery<ProductTagWithCount>("Exec ProductTagCountLoadAll @StoreId", pStoreId);
+                }
+                else
+                {
+                    //stored procedures aren't supported. Use LINQ
+                    tagCount = _productTagRepository.Table
+                        .Select(pt => new ProductTagWithCount
+                        {
+                            ProductTagId = pt.Id,
+                            ProductCount = (storeId > 0 && !QuerySettings.IgnoreMultiStore) ?
+                                (from p in pt.Products
+                                 join sm in _storeMappingRepository.Table on new { pid = p.Id, pname = "Product" } equals new { pid = sm.EntityId, pname = sm.EntityName } into psm
+                                 from sm in psm.DefaultIfEmpty()
+                                 where (!p.LimitedToStores || storeId == sm.StoreId) && !p.Deleted && p.Published
+                                 select p).Count() :
+                                pt.Products.Count(p => !p.Deleted && p.Published)
+                        });
+                }
 
-					tagCount = _dbContext.SqlQuery<ProductTagWithCount>("Exec ProductTagCountLoadAll @StoreId", pStoreId);
-				}
-				else
-				{
-					//stored procedures aren't supported. Use LINQ
+                return tagCount.ToDictionary(x => x.ProductTagId, x => x.ProductCount);
+            });
+        }
 
-					tagCount = _productTagRepository.Table
-						.Select(pt => new ProductTagWithCount
-						{
-							ProductTagId = pt.Id,
-							ProductCount = (storeId > 0 && !QuerySettings.IgnoreMultiStore) ?
-								(from p in pt.Products
-								join sm in _storeMappingRepository.Table on new { pid = p.Id, pname = "Product" } equals new { pid = sm.EntityId, pname = sm.EntityName } into psm
-								from sm in psm.DefaultIfEmpty()
-								where (!p.LimitedToStores || storeId == sm.StoreId) && !p.Deleted && p.Published
-								select p).Count() :
-								pt.Products.Count(p => !p.Deleted && p.Published)
-						});
-				}
-
-				return tagCount.ToDictionary(x => x.ProductTagId, x => x.ProductCount);
-			});
-		}
-
-		#endregion
+        #endregion
 
         #region Methods
 
