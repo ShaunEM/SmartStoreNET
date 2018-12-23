@@ -10,21 +10,21 @@ namespace SmartStore.GoogleMerchantCenter.Data.Migrations
         {
 			if (DbMigrationContext.Current.SuppressInitialCreate<GoogleProductObjectContext>())
 				return;
-			
-			CreateTable(
+
+                CreateTable(
                 "dbo.GoogleProduct",
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
                         ProductId = c.Int(nullable: false),
-                        Taxonomy = c.String(maxLength: 4000),
-                        Gender = c.String(maxLength: 4000),
-                        AgeGroup = c.String(maxLength: 4000),
-                        Color = c.String(maxLength: 4000),
-                        Size = c.String(maxLength: 4000),
-                        Material = c.String(maxLength: 4000),
-                        Pattern = c.String(maxLength: 4000),
-                        ItemGroupId = c.String(maxLength: 4000),
+                        Taxonomy = c.String(maxLength: 250),
+                        Gender = c.String(maxLength: 250),
+                        AgeGroup = c.String(maxLength: 250),
+                        Color = c.String(maxLength: 250),
+                        Size = c.String(maxLength: 250),
+                        Material = c.String(maxLength: 250),
+                        Pattern = c.String(maxLength: 250),
+                        ItemGroupId = c.String(maxLength: 250),
                     })
                 .PrimaryKey(t => t.Id);
             

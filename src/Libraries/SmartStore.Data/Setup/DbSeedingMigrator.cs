@@ -27,7 +27,8 @@ namespace SmartStore.Data.Setup
 		/// </summary>
 		public DbSeedingMigrator()	: this(new MigrationsConfiguration())
 		{
-		}
+            
+        }
 
 		/// <summary>
 		/// Initializes a new instance of the DbMigrator class.
@@ -35,7 +36,7 @@ namespace SmartStore.Data.Setup
 		/// <param name="configuration">Configuration to be used for the migration process.</param>
 		public DbSeedingMigrator(DbMigrationsConfiguration configuration): base(configuration)
 		{
-           
+            configuration.SetSqlGenerator("MySql.Data.MySqlClient", new SqlGeneratorMySQL());
         }
 
 		public ILogger Logger
@@ -95,8 +96,10 @@ namespace SmartStore.Data.Setup
 			int result = 0;
 			_isMigrating = true;
 
-			// Apply migrations
-			foreach (var migrationId in pendingMigrations)
+            
+
+            // Apply migrations
+            foreach (var migrationId in pendingMigrations)
 			{
 				if (MigratorUtils.IsAutomaticMigration(migrationId))
 					continue;

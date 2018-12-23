@@ -19,7 +19,7 @@ namespace SmartStore.Tax.Data.Migrations
                         TaxCategoryId = c.Int(nullable: false),
                         CountryId = c.Int(nullable: false),
                         StateProvinceId = c.Int(nullable: false),
-                        Zip = c.String(maxLength: 4000),
+                        Zip = c.String(maxLength: 250),
                         Percentage = c.Decimal(nullable: false, precision: 18, scale: 4),
                     })
                 .PrimaryKey(t => t.Id);

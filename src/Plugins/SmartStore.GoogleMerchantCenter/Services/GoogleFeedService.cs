@@ -189,14 +189,11 @@ namespace SmartStore.GoogleMerchantCenter.Services
 
 			// there's no way to share a context instance across repositories in EF.
 			// so we have to fallback to pure SQL here to get the data paged and filtered.
-
 			var whereClause = new StringBuilder("(NOT ([t2].[Deleted] = 1)) AND ([t2].[VisibleIndividually] = 1)");
-
 			if (searchProductName.HasValue())
 			{
 				whereClause.AppendFormat(" AND ([t2].[Name] LIKE '%{0}%')", searchProductName.Replace("'", "''"));
 			}
-
 			if (touched.HasValue())
 			{
 				if (touched.IsCaseInsensitiveEqual("touched"))
@@ -205,11 +202,11 @@ namespace SmartStore.GoogleMerchantCenter.Services
 					whereClause.Append(" AND ([t2].[IsTouched] = 0 OR [t2].[IsTouched] IS NULL)");
 			}
 
+
+
 			string sql = null;
 			string sqlCount = null;
-			var isSqlServer = DataSettings.Current.IsSqlServer;
-
-			if (isSqlServer)
+			if (DataSettings.Current.IsSqlServer)
 			{
 				// fastest possible paged data query
 				sql =
@@ -226,7 +223,48 @@ namespace SmartStore.GoogleMerchantCenter.Services
 					" WHERE [t3].[ROW_NUMBER] BETWEEN {0} + 1 AND {0} + {1}" +
 					" ORDER BY [t3].[ROW_NUMBER]";
 			}
-			else
+            else if (DataSettings.Current.IsMySqlServer)
+            {
+                StringBuilder sbWhere = new StringBuilder("product.deleted != 1 and product.visibleIndividually = 1");
+                if (searchProductName.HasValue())
+                {
+                    sbWhere.AppendFormat($" and product.name LIKE '%{searchProductName.Replace("'", "''")}%')");
+                }
+                if (touched.HasValue())
+                {
+                    if (touched.IsCaseInsensitiveEqual("touched"))
+                        sbWhere.Append(" and GoogleProduct.IsTouched = 1");
+                    else
+                        sbWhere.Append(" and (GoogleProduct.IsTouched = 0 or GoogleProduct.IsTouched is null)");
+                }
+                sql = $@"select 
+                            product.Id, 
+                            product.Name, 
+                            product.SKU, 
+                            product.ProductTypeId,
+                            GoogleProduct.Taxonomy, 
+	                        GoogleProduct.Gender,
+	                        GoogleProduct.AgeGroup,
+	                        GoogleProduct.Color,
+	                        GoogleProduct.Size,
+	                        GoogleProduct.Material,
+	                        GoogleProduct.Pattern,
+	                        IFNULL(GoogleProduct.Export,0) as Export,
+                            IFNULL(GoogleProduct.Multipack,0) as Multipack,
+	                        GoogleProduct.IsBundle,
+	                        GoogleProduct.IsAdult,
+	                        GoogleProduct.EnergyEfficiencyClass,
+	                        GoogleProduct.CustomLabel0,
+	                        GoogleProduct.CustomLabel1,
+	                        GoogleProduct.CustomLabel2,
+	                        GoogleProduct.CustomLabel3,
+	                        GoogleProduct.CustomLabel4
+                         from 
+	                         product
+                             left join GoogleProduct on product.id = GoogleProduct.ProductId
+                         where {sbWhere.ToString()}";
+            }
+            else
 			{
 				// OFFSET... FETCH NEXT requires SQL Server 2012 or SQL CE 4
 				sql =
@@ -282,10 +320,18 @@ namespace SmartStore.GoogleMerchantCenter.Services
 
 			if (data.Count > 0)
 			{
-				if (isSqlServer)
-					model.Total = data.First().TotalCount;
+				if (DataSettings.Current.IsSqlServer)
+                {
+                    model.Total = data.First().TotalCount;
+                }
+                else if(DataSettings.Current.IsMySqlServer)
+                {
+                    model.Total = data.First().TotalCount;
+                }
 				else
-					model.Total = _gpRepository.Context.SqlQuery<int>(sqlCount).FirstOrDefault();
+                {
+                    model.Total = _gpRepository.Context.SqlQuery<int>(sqlCount).FirstOrDefault();
+                }
 			}
 			else
 			{

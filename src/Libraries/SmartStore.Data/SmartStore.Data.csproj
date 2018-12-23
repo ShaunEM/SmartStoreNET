@@ -670,6 +670,7 @@
     <Compile Include="Setup\Builder\LocaleResourcesBuilder.cs" />
     <Compile Include="Setup\Builder\LocaleResourcesMigrator.cs" />
     <Compile Include="Setup\MigratorUtils.cs" />
+    <Compile Include="Setup\SqlGeneratorMySQL.cs" />
     <Compile Include="Setup\SeedData\SeedDataException.cs" />
     <Compile Include="Setup\SeedData\SeedEntityExtensions.cs" />
     <Compile Include="Setup\SeedData\SeedDataConfiguration.cs" />

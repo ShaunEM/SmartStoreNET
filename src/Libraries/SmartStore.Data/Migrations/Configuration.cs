@@ -10,6 +10,7 @@ namespace SmartStore.Data.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
+            
         }
 
         protected override void Seed(SmartStore.Data.SmartObjectContext context)

@@ -32,7 +32,7 @@ namespace SmartStore.Data
 		/// </summary>
 		protected ObjectContextBase(): this(GetConnectionString(), null)
 		{
-            Database.Log = sql => Debug.Write($"ObjectContextBase: {sql}");
+
         }
 
 		protected ObjectContextBase(string nameOrConnectionString, string alias = null)

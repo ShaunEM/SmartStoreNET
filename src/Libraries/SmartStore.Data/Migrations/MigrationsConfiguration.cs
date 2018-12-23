@@ -18,10 +18,6 @@
 			AutomaticMigrationsEnabled = false;
 			AutomaticMigrationDataLossAllowed = true;
 			ContextKey = "SmartStore.Core";
-
-            // MOD:
-            //SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
-            SetSqlGenerator("MySql.Data.MySqlClient", new MySQLMigration());
         }
 
 		public void SeedDatabase(SmartObjectContext context)
@@ -598,84 +594,6 @@
             builder.AddOrUpdate("Admin.Common.ProcessingInfo",
                 "{0}: {1} of {2} processed",
                 "{0}: {1} von {2} verarbeitet");
-        }
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public class MySQLMigration : MySqlMigrationSqlGenerator
-    {
-        //public MySQLMigration()
-        //{
-        //    YourContext x = new YourContext();
-        //}
-
-
-
-
-
-        private string TrimSchemaPrefix(string table)
-        {
-            if (table.StartsWith("dbo."))
-                return table.Replace("dbo.", "");
-            return table;
-        }
-
-        protected override MigrationStatement Generate(CreateIndexOperation op)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            sb = sb.Append("CREATE ");
-
-
-           
-
-            if (op.IsUnique)
-            {
-                sb.Append("UNIQUE ");
-            }
-
-            //index_col_name specification can end with ASC or DESC.
-            // sort order are permitted for future extensions for specifying ascending or descending index value storage
-            //Currently, they are parsed but ignored; index values are always stored in ascending order.
-
-            object sort;
-            op.AnonymousArguments.TryGetValue("Sort", out sort);
-            var sortOrder = sort != null && sort.ToString() == "Ascending" ?
-                            "ASC" : "DESC";
-
-            sb.AppendFormat("index  `{0}` on `{1}` (", op.Name, TrimSchemaPrefix(op.Table));
-            sb.Append(string.Join(",", op.Columns.Select(c => "`" + c + "` " + sortOrder)) + ") ");
-
-            object indexTypeDefinition;
-            op.AnonymousArguments.TryGetValue("Type", out indexTypeDefinition);
-
-            var indexType = indexTypeDefinition != null && string.Compare(indexTypeDefinition.ToString(), "Hash", StringComparison.InvariantCultureIgnoreCase) > 0 ?
-                            "HASH" : "BTREE";
-
-            sb.Append("using " + indexType);
-
-            return new MigrationStatement() {
-                Sql = sb.ToString()
-            };
         }
     }
 }

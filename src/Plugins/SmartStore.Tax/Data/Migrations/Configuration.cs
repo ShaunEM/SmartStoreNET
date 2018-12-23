@@ -12,8 +12,6 @@
 			AutomaticMigrationsEnabled = false;
 			MigrationsDirectory = @"Data\Migrations";
 			ContextKey = "SmartStore.TaxCountryStateZip"; // DO NOT CHANGE
-
-            //SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
         }
 
 		protected override void Seed(TaxRateObjectContext context)

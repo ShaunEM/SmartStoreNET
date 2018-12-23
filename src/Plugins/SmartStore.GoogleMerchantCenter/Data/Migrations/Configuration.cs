@@ -13,7 +13,7 @@
 			MigrationsDirectory = @"Data\Migrations";
 			ContextKey = "SmartStore.FeedGoogle"; // DO NOT CHANGE!
 
-            //SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
+            
         }
 
 		protected override void Seed(GoogleProductObjectContext context)
