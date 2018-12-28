@@ -476,7 +476,10 @@ namespace SmartStore.Admin.Controllers
 				SearchCustomerRoleIds = registeredRoleId.ToString()
 			};
 
-			listModel.AvailableCustomerRoles = allRoles
+                       
+
+
+            listModel.AvailableCustomerRoles = allRoles
 				.Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() })
 				.ToList();
 
@@ -487,7 +490,6 @@ namespace SmartStore.Admin.Controllers
 			};
 
 			var customers = _customerService.SearchCustomers(q);
-
             // Customer list.
             listModel.Customers = new GridModel<CustomerModel>
             {
