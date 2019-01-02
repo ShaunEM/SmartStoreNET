@@ -175,15 +175,113 @@ namespace SmartStore.Data.Utilities
                 tx.Commit();
             }
             return rowseffected;
+            //IDictionary<int, int> picmap = GetPoductPictureMap(ctx, productIds);
+
+
+            // Key = ProductId, Value = MainPictureId
+          //  var toUpate = new Dictionary<int, int?>();
+
+			// 1st pass
+			//int pageIndex = -1;
+   //         while (true)
+   //         {
+   //             var products = PagedList.Create(query, ++pageIndex, 1000);
+   //             IDictionary<int, int> map = GetPoductPictureMap(ctx, products.Select(x => x.Id).ToArray());
+
+   //             foreach (var p in products)
+   //             {
+   //                 int? fixedPictureId = null;
+   //                 if (map.ContainsKey(p.Id))
+   //                 {
+   //                     // Product has still a pic.
+   //                     fixedPictureId = map[p.Id];
+   //                 }
+
+   //                 // Update only if fixed PictureId differs from current
+   //                 if (fixedPictureId != p.MainPictureId)
+   //                 {
+   //                     toUpate.Add(p.Id, fixedPictureId);
+   //                 }
+   //             }
+
+   //             if (!products.HasNextPage)
+   //                 break;
+   //         }
+
+                // 2nd pass
+                //foreach (var chunk in toUpate.Slice(1000))
+                //{
+                //    using (var tx = ctx.Database.BeginTransaction())
+                //    {
+                //        foreach (var kvp in chunk)
+                //        {
+
+                //            if (DataSettings.Current.IsMySqlServer)
+                //            {
+                //                context.ExecuteSqlCommand("Update Product Set MainPictureId = {0} WHERE Product.Id = {1}", false, null, kvp.Value, kvp.Key);
+                //            }
+                //            else
+                //            {
+                //                context.ExecuteSqlCommand("Update [Product] Set [MainPictureId] = {0} WHERE [Id] = {1}", false, null, kvp.Value, kvp.Key);
+                //            }
+                //        }
+
+                //        context.SaveChanges();
+                //        tx.Commit();
+                //    }
+                //}
+            
+			//return toUpate.Count;
 		}
 
 		private static int GetPoductPictureMap(SmartObjectContext context, int productId)
 		{
+            //var map = new Dictionary<int, int>();
+
             int picid = (from p in context.Set<ProductPicture>().AsNoTracking()
                          where p.ProductId == productId
                          orderby p.DisplayOrder
                          select p.PictureId)?.Take(1).SingleOrDefault() ?? 0;
+            //return query.OrderBy(x => x.DisplayOrder).Select(x => x.PictureId).SingleOrDefault();
+
             return picid;
+
+
+            //var query2 = from p in query
+            //             group p by p.ProductId into g
+            //             select new
+            //             {
+            //                 ProductId = g.Key,
+            //                 PictureIds = g.OrderBy(x => x.DisplayOrder).ThenBy(x => x.Id)
+            //                     .Take(1)
+            //                     .Select(x => x.PictureId)
+            //             };
+            //group pp by pp.ProductId into g
+            //            select new
+            //            {
+            //                ProductId = g.Key,
+            //                PictureIds = g.OrderBy(x => x.DisplayOrder).ThenBy(x => x.Id)
+            //                    .Take(1)
+            //                    .Select(x => x.PictureId)
+            //            };
+
+            //map = query2.ToList().ToDictionary(x => x.ProductId, x => x.PictureIds.First());
+
+
+            //var query = from pp in context.Set<ProductPicture>().AsNoTracking()
+            //			where productIds.Contains(pp.ProductId)
+            //			group pp by pp.ProductId into g
+            //			select new
+            //			{
+            //				ProductId = g.Key,
+            //				PictureIds = g.OrderBy(x => x.DisplayOrder).ThenBy(x => x.Id)
+            //					.Take(1)
+            //					.Select(x => x.PictureId)
+            //			};
+
+            //map = query.ToList().ToDictionary(x => x.ProductId, x => x.PictureIds.First());
+
+            //return map;
         }
 
 		#endregion

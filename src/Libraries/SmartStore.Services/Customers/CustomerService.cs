@@ -84,19 +84,24 @@ namespace SmartStore.Services.Customers
             if (q.OnlyWithCart)
             {
                 var cartItemQuery = _shoppingCartItemRepository.TableUntracked.Expand(x => x.Customer);
+
                 if (q.CartType.HasValue)
                 {
                     cartItemQuery = cartItemQuery.Where(x => x.ShoppingCartTypeId == (int)q.CartType.Value);
                 }
+
                 var groupQuery =
                     from sci in cartItemQuery
                     group sci by sci.CustomerId into grp
-                    select grp.Select(x => new
-                    {
-                        x.Customer,
-                        x.CreatedOnUtc
-                    })
-                    .FirstOrDefault();
+                    select grp
+                        .OrderByDescending(x => x.CreatedOnUtc)
+                        .Select(x => new
+                        {
+                            x.Customer,
+                            x.CreatedOnUtc
+                        })
+                        .FirstOrDefault();
+
                 // We have to sort again because of paging.
                 query = groupQuery
                     .OrderByDescending(x => x.CreatedOnUtc)
@@ -168,9 +173,8 @@ namespace SmartStore.Services.Customers
 
 			if (q.CustomerRoleIds != null && q.CustomerRoleIds.Length > 0)
 			{
-                //query = query.Where(c => (c.CustomerRoles.Select(cr => cr.Id).Intersect(q.CustomerRoleIds).Count() > 0));
-                query = query.Where(c => c.CustomerRoles.Any(cr => q.CustomerRoleIds.Contains(cr.Id)));
-            }
+				query = query.Where(c => c.CustomerRoles.Select(cr => cr.Id).Intersect(q.CustomerRoleIds).Count() > 0);
+			}
 
 			if (q.Deleted.HasValue)
 			{
