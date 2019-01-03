@@ -173,8 +173,9 @@ namespace SmartStore.Services.Customers
 
 			if (q.CustomerRoleIds != null && q.CustomerRoleIds.Length > 0)
 			{
-				query = query.Where(c => c.CustomerRoles.Select(cr => cr.Id).Intersect(q.CustomerRoleIds).Count() > 0);
-			}
+                //query = query.Where(c => (c.CustomerRoles.Select(cr => cr.Id).Intersect(q.CustomerRoleIds).Count() > 0));
+                query = query.Where(c => c.CustomerRoles.Any(cr => q.CustomerRoleIds.Contains(cr.Id)));
+            }
 
 			if (q.Deleted.HasValue)
 			{

@@ -483,8 +483,9 @@ namespace SmartStore.Web.Infrastructure.Installation
 
 					var storeMappingService = new StoreMappingService(NullCache.Instance, null, null, null);
                     var storeService = new StoreService(new EfRepository<Store>(_ctx));
-					var storeContext = new WebStoreContext(new Work<IStoreService>(x => storeService), new WebHelper(null), null);
-					var locSettings = new LocalizationSettings();
+                    //var storeContext = new WebStoreContext(new Work<IStoreService>(x => storeService), new WebHelper(null), null);
+                    var storeContext = new WebStoreContext(storeService, new WebHelper(null), null);
+                    var locSettings = new LocalizationSettings();
 
 					var languageService = new LanguageService(
 						NullRequestCache.Instance, 

@@ -321,3 +321,5 @@ Kopie von*
 src/SmartStoreNET.Packager.sln
 Log.txt
 src/Presentation/SmartStore.Web/Themes/FlexMuseo/
+/src/Plugins/SmartStore.Banner
+/src/Plugins/SmartStore.PayFast
